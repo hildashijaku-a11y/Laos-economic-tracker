@@ -4,28 +4,44 @@
   <title>Laos Economic Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
+<body style="font-family: Arial; padding: 24px; max-width: 900px; margin: auto;">
 
-<body style="font-family: Arial; padding: 20px;">
+  <h1>🇱🇦 Laos Economic Tracker</h1>
+  <p>Simple dashboard for selected macro indicators.</p>
 
-<h1>🇱🇦 Laos Economic Tracker</h1>
+  <h3>Inflation (%)</h3>
+  <canvas id="inflationChart"></canvas>
 
-<h3>Inflation (%)</h3>
-<canvas id="inflationChart"></canvas>
+  <h3 style="margin-top:40px;">Exchange Rate (LAK/USD)</h3>
+  <canvas id="fxChart"></canvas>
 
-<script>
-const inflationData = {
-  labels: ["Jan", "Feb", "Mar"],
-  datasets: [{
-    label: "Inflation %",
-    data: [8.5, 7.9, 7.2],
-  }]
-};
+  <script>
+    const inflationData = {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+      datasets: [{
+        label: "Inflation %",
+        data: [8.5, 7.9, 7.2, 6.8, 6.5]
+      }]
+    };
 
-new Chart(document.getElementById("inflationChart"), {
-  type: "line",
-  data: inflationData,
-});
-</script>
+    new Chart(document.getElementById("inflationChart"), {
+      type: "line",
+      data: inflationData
+    });
+
+    const fxData = {
+      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+      datasets: [{
+        label: "LAK/USD",
+        data: [21000, 21300, 21550, 21700, 21900]
+      }]
+    };
+
+    new Chart(document.getElementById("fxChart"), {
+      type: "line",
+      data: fxData
+    });
+  </script>
 
 </body>
 </html>
