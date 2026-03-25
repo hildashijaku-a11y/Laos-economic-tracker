@@ -6,6 +6,8 @@ const BRENT_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ
 const WTI_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1835083988";
 const VIX_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1068023263";
 
+const LAOS_FX_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=158156900";
+
 const LAOS_CPI = {
   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   values: [24.1, 22.8, 21.4, 19.7, 18.3, 17.2]
@@ -561,12 +563,14 @@ function renderLaosTab() {
         <div class="source">Source: Laos CPI series</div>
       </div>
 
-      <div class="card">
-        <h3>Exchange Rate</h3>
-        <p class="sub">LAK / USD</p>
-        <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
-        <div class="source">Source: Laos FX series</div>
-      </div>
+     <div class="grid">
+  <div class="card">
+    <h3>Exchange Rate</h3>
+    <p class="sub">KIP / USD</p>
+    <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
+    <div class="source">Source: Google Sheets</div>
+  </div>
+</div>
 
       <div class="card">
         <h3>Fuel Prices</h3>
@@ -755,11 +759,11 @@ async function drawGlobalCharts() {
   }
 }
 
-function drawLaosCharts() {
+
+  async function drawLaosCharts() {
   try {
-    makeLineChart("cpiChart", LAOS_CPI.labels, LAOS_CPI.values, "%");
-    makeLineChart("fxChart", LAOS_FX.labels, LAOS_FX.values, " LAK");
-    makeLineChart("fuelChart", LAOS_FUEL.labels, LAOS_FUEL.values, " kip");
+    const fx = await fetchSingleSeries(LAOS_FX_CSV);
+    makeLineChart("fxChart", fx.labels, fx.values, " LAK");
   } catch (error) {
     console.error(error);
     document.querySelectorAll(".chart-wrap").forEach(el => {
@@ -767,5 +771,3 @@ function drawLaosCharts() {
     });
   }
 }
-
-render();
