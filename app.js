@@ -6,6 +6,9 @@ const LAOS_CSV =
 const FUEL_CSV =
   "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=96401015";
 
+const CPI_CSV =
+  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1526208390";
+
 root.innerHTML = `
   <style>
     body {
@@ -78,6 +81,15 @@ root.innerHTML = `
         </div>
         <div id="fuelError" class="error"></div>
       </div>
+
+      <div class="card">
+        <div><strong>Inflation</strong></div>
+        <div class="sub">Date and value</div>
+        <div class="chart-wrap">
+          <canvas id="cpiChart"></canvas>
+        </div>
+        <div id="cpiError" class="error"></div>
+      </div>
     </div>
   </div>
 `;
@@ -137,8 +149,8 @@ async function fetchFuel(url) {
   return { labels, diesel, gasoline };
 }
 
-function drawChart(labels, values) {
-  new Chart(document.getElementById("laosChart"), {
+function drawSingleChart(canvasId, labels, values) {
+  new Chart(document.getElementById(canvasId), {
     type: "line",
     data: {
       labels,
@@ -211,10 +223,10 @@ function drawFuelChart(labels, diesel, gasoline) {
   });
 }
 
-async function init() {
+async function initFX() {
   try {
     const data = await fetchSeries(LAOS_CSV);
-    drawChart(data.labels, data.values);
+    drawSingleChart("laosChart", data.labels, data.values);
   } catch (err) {
     console.error(err);
     document.getElementById("errorBox").textContent =
@@ -233,5 +245,17 @@ async function initFuel() {
   }
 }
 
-init();
+async function initCPI() {
+  try {
+    const data = await fetchSeries(CPI_CSV);
+    drawSingleChart("cpiChart", data.labels, data.values);
+  } catch (e) {
+    console.error(e);
+    document.getElementById("cpiError").textContent =
+      "Could not load inflation data.";
+  }
+}
+
+initFX();
 initFuel();
+initCPI();
