@@ -17,14 +17,39 @@ def fetch_series(series_id):
     with urlopen(url) as response:
         text = response.read().decode("utf-8")
 
-    reader = csv.DictReader(StringIO(text))
-    rows = [r for r in reader if r["VALUE"] not in (".", "", None)]
+    reader = csv.reader(StringIO(text))
+    rows = list(reader)
 
-    rows = rows[-60:]
+    if len(rows) < 2:
+        raise ValueError(f"No data returned for {series_id}")
+
+    header = rows[0]
+    data_rows = rows[1:]
+
+    if len(header) < 2:
+        raise ValueError(f"Unexpected CSV format for {series_id}: {header}")
+
+    labels = []
+    values = []
+
+    for row in data_rows:
+        if len(row) < 2:
+            continue
+        date = row[0]
+        value = row[1]
+
+        if value in (".", "", None):
+            continue
+
+        labels.append(date)
+        values.append(float(value))
+
+    labels = labels[-60:]
+    values = values[-60:]
 
     return {
-        "labels": [r["DATE"] for r in rows],
-        "values": [float(r["VALUE"]) for r in rows],
+        "labels": labels,
+        "values": values,
     }
 
 def main():
