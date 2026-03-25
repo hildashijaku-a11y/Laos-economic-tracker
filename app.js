@@ -1,8 +1,8 @@
 const root = document.getElementById("root");
 
-const state = {
-  tab: "overview"
-};
+const BRENT_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=0";
+const WTI_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1835083988";
+const VIX_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1068023263";
 
 const styles = `
   :root{
@@ -10,7 +10,6 @@ const styles = `
     --muted:#667085;
     --border:#d9dde5;
     --bg:#f5f6f8;
-    --card:#fbfbfc;
     --blue:#2f5bea;
   }
 
@@ -35,7 +34,6 @@ const styles = `
     border-bottom: 2px solid #d8dde6;
     padding-top: 12px;
     margin-bottom: 18px;
-    overflow-x: auto;
   }
 
   .tab {
@@ -45,44 +43,12 @@ const styles = `
     font: inherit;
     font-size: 15px;
     color: #475467;
-    cursor: pointer;
-    white-space: nowrap;
   }
 
   .tab.active {
     color: var(--blue);
     border-bottom: 2px solid var(--blue);
     margin-bottom: -2px;
-    font-weight: 600;
-  }
-
-  .top-controls {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 16px 0 8px;
-    flex-wrap: wrap;
-  }
-
-  .top-label {
-    font-size: 14px;
-    color: #475467;
-  }
-
-  .pill {
-    border: 1px solid #d0d5dd;
-    background: #fff;
-    color: #344054;
-    border-radius: 8px;
-    padding: 6px 12px;
-    font: inherit;
-    font-size: 14px;
-  }
-
-  .pill.active {
-    background: #4363f1;
-    color: white;
-    border-color: #4363f1;
     font-weight: 600;
   }
 
@@ -159,67 +125,8 @@ const styles = `
     color: var(--muted);
   }
 
-  .overview-box {
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 18px;
-    margin-top: 16px;
-  }
-
-  .overview-box h2 {
-    margin: 0 0 8px;
-    font-size: 22px;
-  }
-
-  .overview-box p, .overview-box li {
-    line-height: 1.7;
-    color: #475467;
-    font-size: 15px;
-  }
-
-  .overview-box ul {
-    margin: 10px 0 0 18px;
-    padding: 0;
-  }
-
-  .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-top: 16px;
-  }
-
-  .kpi {
-    background: white;
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 14px;
-  }
-
-  .kpi-label {
-    font-size: 12px;
-    text-transform: uppercase;
-    color: var(--muted);
-    letter-spacing: 0.05em;
-    margin-bottom: 8px;
-    font-weight: 700;
-  }
-
-  .kpi-value {
-    font-size: 28px;
-    font-weight: 700;
-    margin-bottom: 4px;
-  }
-
-  .kpi-note {
-    font-size: 13px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
   @media (max-width: 900px) {
-    .grid, .kpi-grid { grid-template-columns: 1fr; }
+    .grid { grid-template-columns: 1fr; }
     .title { font-size: 30px; }
   }
 `;
@@ -229,106 +136,72 @@ function render() {
     <style>${styles}</style>
     <div class="page">
       <div class="tabs">
-        <button class="tab ${state.tab === "overview" ? "active" : ""}" data-tab="overview">Crisis Overview</button>
-        <button class="tab ${state.tab === "global" ? "active" : ""}" data-tab="global">Global Markets</button>
-        <button class="tab ${state.tab === "laos" ? "active" : ""}" data-tab="laos">Laos Impact</button>
+        <button class="tab active">Global Markets</button>
       </div>
 
-      ${state.tab === "overview" ? renderOverview() : ""}
-      ${state.tab === "global" ? renderGlobal() : ""}
-      ${state.tab === "laos" ? renderLaos() : ""}
+      <section class="hero">
+        <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
+        <div class="title">Global market indicators</div>
+        <div class="dek">
+          Live global indicators feeding the oil shock monitor.
+        </div>
+        <div class="meta">Source: Google Sheets live</div>
+      </section>
+
+      <div class="grid">
+        <div class="card">
+          <h3>Brent Crude</h3>
+          <p class="sub">Live from Google Sheets.</p>
+          <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
+          <div class="source">Source: Brent sheet</div>
+        </div>
+
+        <div class="card">
+          <h3>WTI Crude</h3>
+          <p class="sub">Live from Google Sheets.</p>
+          <div class="chart-wrap"><canvas id="wtiChart"></canvas></div>
+          <div class="source">Source: WTI sheet</div>
+        </div>
+
+        <div class="card">
+          <h3>VIX</h3>
+          <p class="sub">Live from Google Sheets.</p>
+          <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
+          <div class="source">Source: VIX sheet</div>
+        </div>
+      </div>
     </div>
   `;
 
-  document.querySelectorAll(".tab").forEach(btn => {
-    btn.addEventListener("click", () => {
-      state.tab = btn.dataset.tab;
-      render();
-    });
+  drawGlobalCharts();
+}
+
+async function fetchSingleSeries(csvUrl) {
+  const res = await fetch(csvUrl);
+  const text = await res.text();
+
+  const rows = text.trim().split("\n").map(row => row.split(","));
+  rows.shift();
+
+  const labels = [];
+  const values = [];
+
+  rows.forEach(row => {
+    if (row.length < 2) return;
+
+    const label = row[0]?.trim();
+    const value = parseFloat(row[1]);
+
+    if (!label || Number.isNaN(value)) return;
+
+    labels.push(label);
+    values.push(value);
   });
 
-  if (state.tab === "global") drawGlobalCharts();
-  if (state.tab === "laos") drawLaosCharts();
+  return { labels, values };
 }
 
-function renderOverview() {
-  return `
-    <section class="hero">
-      <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
-      <div class="title">How a global oil shock could transmit through Laos</div>
-      <div class="dek">
-        This tracker monitors the main channels through which higher oil prices could affect Lao PDR:
-        imported fuel costs, domestic pump prices, inflation, the exchange rate, and external buffers.
-      </div>
-      <div class="meta">Last updated automatically from FRED-backed local cache</div>
-    </section>
-
-    <div class="overview-box">
-      <h2>Why this matters</h2>
-      <p>
-        Laos is a net fuel importer, so a sustained increase in global oil prices can quickly raise import
-        costs and domestic fuel prices. If this coincides with exchange-rate pressure, inflation effects
-        can intensify and external buffers can come under additional stress.
-      </p>
-    </div>
-  `;
-}
-
-function renderGlobal() {
-  return `
-    <div class="top-controls">
-      <div class="top-label">Data source:</div>
-      <button class="pill active">market-data.json</button>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Brent Crude</h3>
-        <p class="sub">Cached from FRED series DCOILBRENTEU.</p>
-        <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
-        <div class="source">Source: FRED / ICE Brent proxy</div>
-      </div>
-
-      <div class="card">
-        <h3>WTI Crude</h3>
-        <p class="sub">Cached from FRED series DCOILWTICO.</p>
-        <div class="chart-wrap"><canvas id="wtiChart"></canvas></div>
-        <div class="source">Source: FRED / WTI proxy</div>
-      </div>
-
-      <div class="card">
-        <h3>VIX</h3>
-        <p class="sub">Cached from FRED series VIXCLS.</p>
-        <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
-        <div class="source">Source: FRED / CBOE VIX</div>
-      </div>
-
-      <div class="card">
-        <h3>Gold</h3>
-        <p class="sub">Cached from FRED series GOLDAMGBD228NLBM.</p>
-        <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
-        <div class="source">Source: FRED / LBMA Gold Price</div>
-      </div>
-    </div>
-  `;
-}
-
-function renderLaos() {
-  return `
-    <div class="overview-box">
-      <h2>Laos Impact</h2>
-      <p>Këtë tab e mbushim pasi të lidhim indikatorët e Laos.</p>
-    </div>
-  `;
-}
-
-async function fetchLocalMarketData() {
-  const res = await fetch("./market-data.json");
-  if (!res.ok) throw new Error("Could not load market-data.json");
-  return res.json();
-}
-
-function makeLineChart(canvasId, labels, values, valueSuffix = "") {
+function makeLineChart(canvasId, labels, values, suffix = "") {
   new Chart(document.getElementById(canvasId), {
     type: "line",
     data: {
@@ -345,7 +218,10 @@ function makeLineChart(canvasId, labels, values, valueSuffix = "") {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { mode: "index", intersect: false },
+      interaction: {
+        mode: "index",
+        intersect: false
+      },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -357,7 +233,7 @@ function makeLineChart(canvasId, labels, values, valueSuffix = "") {
           displayColors: false,
           callbacks: {
             label: function(context) {
-              return `${context.parsed.y}${valueSuffix}`;
+              return `${context.parsed.y}${suffix}`;
             }
           }
         }
@@ -377,20 +253,21 @@ function makeLineChart(canvasId, labels, values, valueSuffix = "") {
 
 async function drawGlobalCharts() {
   try {
-    const data = await fetchLocalMarketData();
+    const [brent, wti, vix] = await Promise.all([
+      fetchSingleSeries(BRENT_CSV),
+      fetchSingleSeries(WTI_CSV),
+      fetchSingleSeries(VIX_CSV)
+    ]);
 
-    makeLineChart("brentChart", data.brent.labels, data.brent.values, " USD/bbl");
-    makeLineChart("wtiChart", data.wti.labels, data.wti.values, " USD/bbl");
-    makeLineChart("vixChart", data.vix.labels, data.vix.values, "");
-    makeLineChart("goldChart", data.gold.labels, data.gold.values, " USD/oz");
+    makeLineChart("brentChart", brent.labels, brent.values, " USD/bbl");
+    makeLineChart("wtiChart", wti.labels, wti.values, " USD/bbl");
+    makeLineChart("vixChart", vix.labels, vix.values, "");
   } catch (error) {
     console.error(error);
     document.querySelectorAll(".chart-wrap").forEach(el => {
-      el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load cached data.</div>`;
+      el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load Google Sheets data.</div>`;
     });
   }
 }
-
-function drawLaosCharts() {}
 
 render();
