@@ -22,10 +22,9 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Fetch market data
-        env:
-          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
-        run: python scripts/fetch_market_data.py
+  
+       - name: Fetch market data
+  run: python scripts/fetch_market_data.py
 
       - name: Commit updated JSON
         run: |
