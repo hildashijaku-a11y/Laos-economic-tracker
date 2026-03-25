@@ -150,12 +150,127 @@ const styles = `
     .title { font-size: 30px; }
   }
 `;
+.overview-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 18px 0 22px;
+}
 
+.overview-card {
+  border-radius: 10px;
+  padding: 14px 14px 12px;
+  border: 1px solid #eadfdf;
+  min-height: 92px;
+}
+
+.overview-card.red { background: #f6e1e1; }
+.overview-card.yellow { background: #efe6b9; }
+.overview-card.green { background: #d8efdf; }
+
+.overview-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #a43d2f;
+  margin-bottom: 8px;
+}
+
+.overview-value {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: #9a3c11;
+}
+
+.overview-value .unit {
+  font-size: 13px;
+  font-weight: 500;
+  color: #667085;
+}
+
+.overview-change {
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #b54708;
+}
+
+.overview-change.green-text {
+  color: #027a48;
+}
+
+@media (max-width: 1100px) {
+  .overview-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-grid {
+    grid-template-columns: 1fr;
+  }
+}
+function renderOverview() {
+  return `
+    <div class="overview-grid">
+      <div class="overview-card red">
+        <div class="overview-label">Severity Score</div>
+        <div class="overview-value">10 <span class="unit">/10</span></div>
+      </div>
+
+      <div class="overview-card red">
+        <div class="overview-label">Hormuz Transits</div>
+        <div class="overview-value">5 <span class="unit">ships/day</span></div>
+        <div class="overview-change green-text">-96.4% vs pre-crisis</div>
+      </div>
+
+      <div class="overview-card yellow">
+        <div class="overview-label">Brent Crude</div>
+        <div class="overview-value">98.83 <span class="unit">USD/bbl</span></div>
+        <div class="overview-change">+45.3% vs pre-crisis</div>
+      </div>
+
+      <div class="overview-card yellow">
+        <div class="overview-label">WTI Crude</div>
+        <div class="overview-value">90.67 <span class="unit">USD/bbl</span></div>
+        <div class="overview-change">+48.6% vs pre-crisis</div>
+      </div>
+
+      <div class="overview-card yellow">
+        <div class="overview-label">VIX</div>
+        <div class="overview-value">24.85 <span class="unit">index</span></div>
+        <div class="overview-change">+53.4% vs pre-crisis</div>
+      </div>
+
+      <div class="overview-card green">
+        <div class="overview-label">CPI</div>
+        <div class="overview-value">3.35 <span class="unit">%</span></div>
+        <div class="overview-change green-text">Latest y/y</div>
+      </div>
+
+      <div class="overview-card green">
+        <div class="overview-label">Exchange Rate</div>
+        <div class="overview-value">26,344 <span class="unit">LAK/USD</span></div>
+        <div class="overview-change green-text">Official</div>
+      </div>
+
+      <div class="overview-card red">
+        <div class="overview-label">Fuel Price</div>
+        <div class="overview-value">33,420 <span class="unit">kip/L</span></div>
+        <div class="overview-change">Diesel retail</div>
+      </div>
+    </div>
+  `;
+}
 function render() {
   root.innerHTML = `
     <style>${styles}</style>
-    <div class="page">
-      <div class="tabs">
+   <div class="page">
+  ${renderOverview()}
+
+  <div class="tabs">
         <button class="tab ${activeTab === "global" ? "active" : ""}" id="tab-global">
           Global Markets
         </button>
