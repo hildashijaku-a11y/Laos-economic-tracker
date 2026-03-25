@@ -28,12 +28,6 @@ const styles = `
     --border:#d9dde5;
     --bg:#f5f6f8;
     --blue:#2f5bea;
-    --red-bg:#f6e1e1;
-    --yellow-bg:#efe6b9;
-    --green-bg:#d8efdf;
-    --red-text:#9a3c11;
-    --green-text:#027a48;
-    --orange-text:#b54708;
   }
 
   * { box-sizing: border-box; }
@@ -65,9 +59,9 @@ const styles = `
     min-height: 92px;
   }
 
-  .overview-card.red { background: var(--red-bg); }
-  .overview-card.yellow { background: var(--yellow-bg); }
-  .overview-card.green { background: var(--green-bg); }
+  .overview-card.red { background: #f6e1e1; }
+  .overview-card.yellow { background: #efe6b9; }
+  .overview-card.green { background: #d8efdf; }
 
   .overview-label {
     font-size: 11px;
@@ -82,24 +76,24 @@ const styles = `
     font-size: 18px;
     font-weight: 700;
     line-height: 1.1;
-    color: var(--red-text);
+    color: #9a3c11;
   }
 
   .overview-value .unit {
     font-size: 13px;
     font-weight: 500;
-    color: var(--muted);
+    color: #667085;
   }
 
   .overview-change {
     margin-top: 6px;
     font-size: 12px;
     font-weight: 600;
-    color: var(--orange-text);
+    color: #b54708;
   }
 
   .overview-change.green-text {
-    color: var(--green-text);
+    color: #027a48;
   }
 
   .tabs {
@@ -269,7 +263,7 @@ function render() {
     <style>${styles}</style>
 
     <div class="page">
-      ${activeTab === "laos" ? renderOverview() : ""}
+      ${renderOverview()}
 
       <div class="tabs">
         <button class="tab ${activeTab === "global" ? "active" : ""}" id="tab-global">
