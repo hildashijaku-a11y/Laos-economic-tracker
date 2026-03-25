@@ -1,5 +1,4 @@
 const root = document.getElementById("root");
-const FRED_API_KEY = "c56be78d8aae61df44cbeb137ae473d9";
 
 const state = {
   tab: "overview"
@@ -154,10 +153,6 @@ const styles = `
     height: 230px;
   }
 
-  .wide .chart-wrap {
-    height: 280px;
-  }
-
   .source {
     margin-top: 12px;
     font-size: 13px;
@@ -252,13 +247,8 @@ function render() {
     });
   });
 
-  if (state.tab === "global") {
-    drawGlobalCharts();
-  }
-
-  if (state.tab === "laos") {
-    drawLaosCharts();
-  }
+  if (state.tab === "global") drawGlobalCharts();
+  if (state.tab === "laos") drawLaosCharts();
 }
 
 function renderOverview() {
@@ -269,9 +259,8 @@ function renderOverview() {
       <div class="dek">
         This tracker monitors the main channels through which higher oil prices could affect Lao PDR:
         imported fuel costs, domestic pump prices, inflation, the exchange rate, and external buffers.
-        It separates the global shock from its country-level effects.
       </div>
-      <div class="meta">Last updated: March 2026</div>
+      <div class="meta">Last updated automatically from FRED-backed local cache</div>
     </section>
 
     <div class="overview-box">
@@ -281,34 +270,6 @@ function renderOverview() {
         costs and domestic fuel prices. If this coincides with exchange-rate pressure, inflation effects
         can intensify and external buffers can come under additional stress.
       </p>
-      <ul>
-        <li>Global oil prices are the external shock.</li>
-        <li>Fuel costs and the exchange rate are the main transmission channels.</li>
-        <li>Inflation, reserves, and macro stability reflect the country-level impact.</li>
-      </ul>
-    </div>
-
-    <div class="kpi-grid">
-      <div class="kpi">
-        <div class="kpi-label">Brent</div>
-        <div class="kpi-value">Live</div>
-        <div class="kpi-note">Pulled from FRED series.</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">WTI</div>
-        <div class="kpi-value">Live</div>
-        <div class="kpi-note">Pulled from FRED series.</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">VIX</div>
-        <div class="kpi-value">Live</div>
-        <div class="kpi-note">Pulled from FRED series.</div>
-      </div>
-      <div class="kpi">
-        <div class="kpi-label">Gold</div>
-        <div class="kpi-value">Live</div>
-        <div class="kpi-note">Pulled from FRED series.</div>
-      </div>
     </div>
   `;
 }
@@ -316,35 +277,35 @@ function renderOverview() {
 function renderGlobal() {
   return `
     <div class="top-controls">
-      <div class="top-label">Date range:</div>
-      <button class="pill active">Last 60 observations</button>
+      <div class="top-label">Data source:</div>
+      <button class="pill active">market-data.json</button>
     </div>
 
     <div class="grid">
       <div class="card">
         <h3>Brent Crude</h3>
-        <p class="sub">Live series from FRED: DCOILBRENTEU.</p>
+        <p class="sub">Cached from FRED series DCOILBRENTEU.</p>
         <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
         <div class="source">Source: FRED / ICE Brent proxy</div>
       </div>
 
       <div class="card">
         <h3>WTI Crude</h3>
-        <p class="sub">Live series from FRED: DCOILWTICO.</p>
+        <p class="sub">Cached from FRED series DCOILWTICO.</p>
         <div class="chart-wrap"><canvas id="wtiChart"></canvas></div>
         <div class="source">Source: FRED / WTI proxy</div>
       </div>
 
       <div class="card">
         <h3>VIX</h3>
-        <p class="sub">Live series from FRED: VIXCLS.</p>
+        <p class="sub">Cached from FRED series VIXCLS.</p>
         <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
         <div class="source">Source: FRED / CBOE VIX</div>
       </div>
 
       <div class="card">
         <h3>Gold</h3>
-        <p class="sub">Live series from FRED: GOLDAMGBD228NLBM.</p>
+        <p class="sub">Cached from FRED series GOLDAMGBD228NLBM.</p>
         <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
         <div class="source">Source: FRED / LBMA Gold Price</div>
       </div>
@@ -354,70 +315,17 @@ function renderGlobal() {
 
 function renderLaos() {
   return `
-    <div class="top-controls">
-      <div class="top-label">Status:</div>
-      <button class="pill active">Placeholder</button>
-    </div>
-
-    <div class="grid">
-      <div class="card">
-        <h3>Retail Fuel Price Index</h3>
-        <p class="sub">Placeholder series until Laos fuel data are added.</p>
-        <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
-        <div class="source">Source: placeholder</div>
-      </div>
-
-      <div class="card">
-        <h3>LAK/USD Exchange Rate</h3>
-        <p class="sub">Placeholder series until BoL data are added.</p>
-        <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
-        <div class="source">Source: placeholder</div>
-      </div>
-
-      <div class="card">
-        <h3>Headline Inflation</h3>
-        <p class="sub">Placeholder series until Laos CPI data are added.</p>
-        <div class="chart-wrap"><canvas id="inflationChart"></canvas></div>
-        <div class="source">Source: placeholder</div>
-      </div>
-
-      <div class="card">
-        <h3>Reserve Cover</h3>
-        <p class="sub">Placeholder series until reserves data are added.</p>
-        <div class="chart-wrap"><canvas id="reservesChart"></canvas></div>
-        <div class="source">Source: placeholder</div>
-      </div>
-
-      <div class="card wide">
-        <h3>Oil shock transmission to Laos</h3>
-        <p class="sub">Illustrative summary of core macro channels.</p>
-        <div class="chart-wrap"><canvas id="transmissionChart"></canvas></div>
-        <div class="source">Source: staff construction</div>
-      </div>
+    <div class="overview-box">
+      <h2>Laos Impact</h2>
+      <p>Këtë tab e mbushim pasi të lidhim indikatorët e Laos.</p>
     </div>
   `;
 }
 
-async function fetchFRED(seriesId) {
-  `https://api.allorigins.win/raw?url=${encodeURIComponent(
-  `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`
-)}`;
-
-  const res = await fetch(url);
-  const data = await res.json();
-
-  if (!data.observations) {
-    throw new Error(`No observations returned for ${seriesId}`);
-  }
-
-  const clean = data.observations
-    .filter(d => d.value !== ".")
-    .slice(-60);
-
-  return {
-    labels: clean.map(d => d.date),
-    values: clean.map(d => Number(d.value))
-  };
+async function fetchLocalMarketData() {
+  const res = await fetch("./market-data.json");
+  if (!res.ok) throw new Error("Could not load market-data.json");
+  return res.json();
 }
 
 function makeLineChart(canvasId, labels, values, valueSuffix = "") {
@@ -437,10 +345,7 @@ function makeLineChart(canvasId, labels, values, valueSuffix = "") {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        mode: "index",
-        intersect: false
-      },
+      interaction: { mode: "index", intersect: false },
       plugins: {
         legend: { display: false },
         tooltip: {
@@ -472,161 +377,20 @@ function makeLineChart(canvasId, labels, values, valueSuffix = "") {
 
 async function drawGlobalCharts() {
   try {
-    const [brent, wti, vix, gold] = await Promise.all([
-      fetchFRED("DCOILBRENTEU"),
-      fetchFRED("DCOILWTICO"),
-      fetchFRED("VIXCLS"),
-      fetchFRED("GOLDAMGBD228NLBM")
-    ]);
+    const data = await fetchLocalMarketData();
 
-    makeLineChart("brentChart", brent.labels, brent.values, " USD/bbl");
-    makeLineChart("wtiChart", wti.labels, wti.values, " USD/bbl");
-    makeLineChart("vixChart", vix.labels, vix.values, "");
-    makeLineChart("goldChart", gold.labels, gold.values, " USD/oz");
+    makeLineChart("brentChart", data.brent.labels, data.brent.values, " USD/bbl");
+    makeLineChart("wtiChart", data.wti.labels, data.wti.values, " USD/bbl");
+    makeLineChart("vixChart", data.vix.labels, data.vix.values, "");
+    makeLineChart("goldChart", data.gold.labels, data.gold.values, " USD/oz");
   } catch (error) {
-    console.error("Error loading FRED data:", error);
-
+    console.error(error);
     document.querySelectorAll(".chart-wrap").forEach(el => {
-      if (el.innerHTML.includes("canvas")) {
-        el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load live data.</div>`;
-      }
+      el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load cached data.</div>`;
     });
   }
 }
 
-function drawLaosCharts() {
-  new Chart(document.getElementById("fuelChart"), {
-    type: "bar",
-    data: {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [{
-        data: [100, 102, 105, 109, 112, 114],
-        borderWidth: 1
-      }]
-    },
-    options: baseBarOptions()
-  });
-
-  new Chart(document.getElementById("fxChart"), {
-    type: "line",
-    data: {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [{
-        data: [21600, 21750, 21820, 22000, 22150, 22300],
-        tension: 0.35,
-        fill: false,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5
-      }]
-    },
-    options: baseLineOptions(" LAK/USD")
-  });
-
-  new Chart(document.getElementById("inflationChart"), {
-    type: "line",
-    data: {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-      datasets: [{
-        data: [6.4, 6.6, 6.9, 7.3, 7.7, 8.1],
-        tension: 0.35,
-        fill: false,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5
-      }]
-    },
-    options: baseLineOptions("%")
-  });
-
-  new Chart(document.getElementById("reservesChart"), {
-    type: "line",
-    data: {
-      labels: ["2023", "2024", "2025", "2026"],
-      datasets: [{
-        data: [2.1, 3.0, 3.8, 3.4],
-        tension: 0.35,
-        fill: false,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5
-      }]
-    },
-    options: baseLineOptions(" months")
-  });
-
-  new Chart(document.getElementById("transmissionChart"), {
-    type: "bar",
-    data: {
-      labels: ["Oil price", "Fuel imports", "FX pressure", "Inflation", "Buffers"],
-      datasets: [{
-        data: [100, 118, 112, 121, 86],
-        borderWidth: 1
-      }]
-    },
-    options: baseBarOptions()
-  });
-}
-
-function baseLineOptions(suffix = "") {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    interaction: {
-      mode: "index",
-      intersect: false
-    },
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#111827",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        padding: 10,
-        displayColors: false,
-        callbacks: {
-          label: function(context) {
-            return `${context.parsed.y}${suffix}`;
-          }
-        }
-      }
-    },
-    scales: {
-      x: {
-        grid: { display: false }
-      },
-      y: {
-        grid: { color: "#e5e7eb" }
-      }
-    }
-  };
-}
-
-function baseBarOptions() {
-  return {
-    responsive: true,
-    maintainAspectRatio: false,
-    plugins: {
-      legend: { display: false },
-      tooltip: {
-        enabled: true,
-        backgroundColor: "#111827",
-        titleColor: "#fff",
-        bodyColor: "#fff",
-        padding: 10,
-        displayColors: false
-      }
-    },
-    scales: {
-      x: {
-        grid: { display: false }
-      },
-      y: {
-        grid: { color: "#e5e7eb" }
-      }
-    }
-  };
-}
+function drawLaosCharts() {}
 
 render();
