@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Laos Economic Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body style="font-family: Arial; padding: 20px;">
+
+<h1>🇱🇦 Laos Economic Tracker</h1>
+
+<h3>Inflation (%)</h3>
+<canvas id="inflationChart"></canvas>
+
+<script>
+const inflationData = {
+  labels: ["Jan", "Feb", "Mar"],
+  datasets: [{
+    label: "Inflation %",
+    data: [8.5, 7.9, 7.2],
+  }]
+};
+
+new Chart(document.getElementById("inflationChart"), {
+  type: "line",
+  data: inflationData,
+});
+</script>
+
+</body>
+</html>
