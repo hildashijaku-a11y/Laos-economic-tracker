@@ -6,8 +6,6 @@ const BRENT_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ
 const WTI_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1835083988";
 const VIX_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1068023263";
 
-// placeholder Laos series for now
-// kur te kesh Google Sheets links per Laos, i zevendesojme direkt
 const LAOS_CPI = {
   labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
   values: [24.1, 22.8, 21.4, 19.7, 18.3, 17.2]
@@ -30,6 +28,12 @@ const styles = `
     --border:#d9dde5;
     --bg:#f5f6f8;
     --blue:#2f5bea;
+    --red-bg:#f6e1e1;
+    --yellow-bg:#efe6b9;
+    --green-bg:#d8efdf;
+    --red-text:#9a3c11;
+    --green-text:#027a48;
+    --orange-text:#b54708;
   }
 
   * { box-sizing: border-box; }
@@ -45,6 +49,57 @@ const styles = `
     max-width: 1220px;
     margin: 0 auto;
     padding: 0 18px 40px;
+  }
+
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 10px;
+    margin: 18px 0 22px;
+  }
+
+  .overview-card {
+    border-radius: 10px;
+    padding: 14px 14px 12px;
+    border: 1px solid #eadfdf;
+    min-height: 92px;
+  }
+
+  .overview-card.red { background: var(--red-bg); }
+  .overview-card.yellow { background: var(--yellow-bg); }
+  .overview-card.green { background: var(--green-bg); }
+
+  .overview-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #a43d2f;
+    margin-bottom: 8px;
+  }
+
+  .overview-value {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--red-text);
+  }
+
+  .overview-value .unit {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--muted);
+  }
+
+  .overview-change {
+    margin-top: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--orange-text);
+  }
+
+  .overview-change.green-text {
+    color: var(--green-text);
   }
 
   .tabs {
@@ -146,72 +201,16 @@ const styles = `
   }
 
   @media (max-width: 900px) {
-    .grid { grid-template-columns: 1fr; }
-    .title { font-size: 30px; }
+    .grid {
+      grid-template-columns: 1fr;
+    }
+
+    .title {
+      font-size: 30px;
+    }
   }
 `;
-.overview-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 10px;
-  margin: 18px 0 22px;
-}
 
-.overview-card {
-  border-radius: 10px;
-  padding: 14px 14px 12px;
-  border: 1px solid #eadfdf;
-  min-height: 92px;
-}
-
-.overview-card.red { background: #f6e1e1; }
-.overview-card.yellow { background: #efe6b9; }
-.overview-card.green { background: #d8efdf; }
-
-.overview-label {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #a43d2f;
-  margin-bottom: 8px;
-}
-
-.overview-value {
-  font-size: 18px;
-  font-weight: 700;
-  line-height: 1.1;
-  color: #9a3c11;
-}
-
-.overview-value .unit {
-  font-size: 13px;
-  font-weight: 500;
-  color: #667085;
-}
-
-.overview-change {
-  margin-top: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #b54708;
-}
-
-.overview-change.green-text {
-  color: #027a48;
-}
-
-@media (max-width: 1100px) {
-  .overview-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-@media (max-width: 640px) {
-  .overview-grid {
-    grid-template-columns: 1fr;
-  }
-}
 function renderOverview() {
   return `
     <div class="overview-grid">
@@ -264,13 +263,15 @@ function renderOverview() {
     </div>
   `;
 }
+
 function render() {
   root.innerHTML = `
     <style>${styles}</style>
-   <div class="page">
-  ${renderOverview()}
 
-  <div class="tabs">
+    <div class="page">
+      ${activeTab === "laos" ? renderOverview() : ""}
+
+      <div class="tabs">
         <button class="tab ${activeTab === "global" ? "active" : ""}" id="tab-global">
           Global Markets
         </button>
@@ -285,10 +286,9 @@ function render() {
             <section class="hero">
               <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
               <div class="title">Global market indicators</div>
-             <div class="dek">
- Brent crude fell to ~$99/bbl and WTI to ~$90.67 on March 24 — continuing the sharp retreat triggered by Trump's postponement of strikes on Iranian energy infrastructure — as risk assets rebounded broadly (S&P 500 +1.4%). VIX eased further to 24.85. Gold slipped to ~$4,320/oz, now down ~23% from the January all-time high of $5,594. Laos fuel prices unchanged since Mar 23 (RON95: 42390 LAK/L; diesel: 40570 LAK/L). Hormuz transits remain near zero. The Strait remains effectively closed on Day 25.
-— Crisis Monitoring Unit · March 24, 2026
-</div>
+              <div class="dek">
+                Brent crude fell to around 99 USD/bbl and WTI to around 91 USD/bbl, while market volatility eased further. This page tracks the external shock environment feeding into the Laos impact monitor.
+              </div>
               <div class="meta">Source: Google Sheets live</div>
             </section>
 
@@ -320,7 +320,7 @@ function render() {
               <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
               <div class="title">Laos macro indicators</div>
               <div class="dek">
-                Domestic transmission channels: prices, exchange rate, and inflation.
+                Laos remains exposed to global fuel shocks through imported energy costs, exchange rate pressures, and inflation pass-through. This tab tracks the main domestic transmission channels.
               </div>
               <div class="meta">Source: placeholder data for now</div>
             </section>
@@ -403,14 +403,16 @@ function makeLineChart(canvasId, labels, values, suffix = "") {
     type: "line",
     data: {
       labels,
-      datasets: [{
-        data: values,
-        tension: 0.35,
-        fill: false,
-        borderWidth: 2,
-        pointRadius: 0,
-        pointHoverRadius: 5
-      }]
+      datasets: [
+        {
+          data: values,
+          tension: 0.35,
+          fill: false,
+          borderWidth: 2,
+          pointRadius: 0,
+          pointHoverRadius: 5
+        }
+      ]
     },
     options: {
       responsive: true,
@@ -429,7 +431,7 @@ function makeLineChart(canvasId, labels, values, suffix = "") {
           padding: 10,
           displayColors: false,
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return `${context.parsed.y}${suffix}`;
             }
           }
@@ -461,7 +463,7 @@ async function drawGlobalCharts() {
     makeLineChart("vixChart", vix.labels, vix.values, "");
   } catch (error) {
     console.error(error);
-    document.querySelectorAll(".chart-wrap").forEach(el => {
+    document.querySelectorAll(".chart-wrap").forEach((el) => {
       el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load Google Sheets data.</div>`;
     });
   }
@@ -474,7 +476,7 @@ function drawLaosCharts() {
     makeLineChart("fuelChart", LAOS_FUEL.labels, LAOS_FUEL.values, " kip");
   } catch (error) {
     console.error(error);
-    document.querySelectorAll(".chart-wrap").forEach(el => {
+    document.querySelectorAll(".chart-wrap").forEach((el) => {
       el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load Laos data.</div>`;
     });
   }
