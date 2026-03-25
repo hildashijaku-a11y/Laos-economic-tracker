@@ -1,8 +1,27 @@
 const root = document.getElementById("root");
 
+let activeTab = "global";
+
 const BRENT_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=0";
 const WTI_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1835083988";
 const VIX_CSV = "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1068023263";
+
+// placeholder Laos series for now
+// kur te kesh Google Sheets links per Laos, i zevendesojme direkt
+const LAOS_CPI = {
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  values: [24.1, 22.8, 21.4, 19.7, 18.3, 17.2]
+};
+
+const LAOS_FX = {
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  values: [21450, 21800, 22120, 22350, 22500, 22420]
+};
+
+const LAOS_FUEL = {
+  labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+  values: [18700, 18950, 19100, 19450, 19600, 19520]
+};
 
 const styles = `
   :root{
@@ -43,6 +62,7 @@ const styles = `
     font: inherit;
     font-size: 15px;
     color: #475467;
+    cursor: pointer;
   }
 
   .tab.active {
@@ -136,51 +156,112 @@ function render() {
     <style>${styles}</style>
     <div class="page">
       <div class="tabs">
-        <button class="tab active">Global Markets</button>
+        <button class="tab ${activeTab === "global" ? "active" : ""}" id="tab-global">
+          Global Markets
+        </button>
+        <button class="tab ${activeTab === "laos" ? "active" : ""}" id="tab-laos">
+          Laos
+        </button>
       </div>
 
-      <section class="hero">
-        <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
-        <div class="title">Global market indicators</div>
-        <div class="dek">
-          Live global indicators feeding the oil shock monitor.
-        </div>
-        <div class="meta">Source: Google Sheets live</div>
-      </section>
+      ${
+        activeTab === "global"
+          ? `
+            <section class="hero">
+              <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
+              <div class="title">Global market indicators</div>
+              <div class="dek">
+                Live global indicators feeding the oil shock monitor.
+              </div>
+              <div class="meta">Source: Google Sheets live</div>
+            </section>
 
-      <div class="grid">
-        <div class="card">
-          <h3>Brent Crude</h3>
-          <p class="sub">Live from Google Sheets.</p>
-          <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
-          <div class="source">Source: Brent sheet</div>
-        </div>
+            <div class="grid">
+              <div class="card">
+                <h3>Brent Crude</h3>
+                <p class="sub">Live from Google Sheets.</p>
+                <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
+                <div class="source">Source: Brent sheet</div>
+              </div>
 
-        <div class="card">
-          <h3>WTI Crude</h3>
-          <p class="sub">Live from Google Sheets.</p>
-          <div class="chart-wrap"><canvas id="wtiChart"></canvas></div>
-          <div class="source">Source: WTI sheet</div>
-        </div>
+              <div class="card">
+                <h3>WTI Crude</h3>
+                <p class="sub">Live from Google Sheets.</p>
+                <div class="chart-wrap"><canvas id="wtiChart"></canvas></div>
+                <div class="source">Source: WTI sheet</div>
+              </div>
 
-        <div class="card">
-          <h3>VIX</h3>
-          <p class="sub">Live from Google Sheets.</p>
-          <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
-          <div class="source">Source: VIX sheet</div>
-        </div>
-      </div>
+              <div class="card">
+                <h3>VIX</h3>
+                <p class="sub">Live from Google Sheets.</p>
+                <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
+                <div class="source">Source: VIX sheet</div>
+              </div>
+            </div>
+          `
+          : `
+            <section class="hero">
+              <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
+              <div class="title">Laos macro indicators</div>
+              <div class="dek">
+                Domestic transmission channels: prices, exchange rate, and inflation.
+              </div>
+              <div class="meta">Source: placeholder data for now</div>
+            </section>
+
+            <div class="grid">
+              <div class="card">
+                <h3>Inflation (CPI)</h3>
+                <p class="sub">Latest available</p>
+                <div class="chart-wrap"><canvas id="cpiChart"></canvas></div>
+                <div class="source">Source: Laos CPI series</div>
+              </div>
+
+              <div class="card">
+                <h3>Exchange Rate</h3>
+                <p class="sub">LAK / USD</p>
+                <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
+                <div class="source">Source: Laos FX series</div>
+              </div>
+
+              <div class="card">
+                <h3>Fuel Prices</h3>
+                <p class="sub">Domestic retail</p>
+                <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
+                <div class="source">Source: Laos fuel series</div>
+              </div>
+            </div>
+          `
+      }
     </div>
   `;
 
-  drawGlobalCharts();
+  document.getElementById("tab-global").onclick = () => {
+    activeTab = "global";
+    render();
+  };
+
+  document.getElementById("tab-laos").onclick = () => {
+    activeTab = "laos";
+    render();
+  };
+
+  if (activeTab === "global") {
+    drawGlobalCharts();
+  } else {
+    drawLaosCharts();
+  }
 }
 
 async function fetchSingleSeries(csvUrl) {
   const res = await fetch(csvUrl);
   const text = await res.text();
 
-  const rows = text.trim().split("\n").map(row => row.split(","));
+  const rows = text
+    .trim()
+    .split("\n")
+    .map(row => row.split(","));
+
   rows.shift();
 
   const labels = [];
@@ -266,6 +347,19 @@ async function drawGlobalCharts() {
     console.error(error);
     document.querySelectorAll(".chart-wrap").forEach(el => {
       el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load Google Sheets data.</div>`;
+    });
+  }
+}
+
+function drawLaosCharts() {
+  try {
+    makeLineChart("cpiChart", LAOS_CPI.labels, LAOS_CPI.values, "%");
+    makeLineChart("fxChart", LAOS_FX.labels, LAOS_FX.values, " LAK");
+    makeLineChart("fuelChart", LAOS_FUEL.labels, LAOS_FUEL.values, " kip");
+  } catch (error) {
+    console.error(error);
+    document.querySelectorAll(".chart-wrap").forEach(el => {
+      el.innerHTML = `<div style="padding:20px;color:#b42318;font-size:14px;">Could not load Laos data.</div>`;
     });
   }
 }
