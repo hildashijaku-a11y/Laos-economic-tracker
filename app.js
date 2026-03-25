@@ -1,4 +1,5 @@
 const root = document.getElementById("root");
+const FRED_API_KEY = "c56be78d8aae61df44cbeb137ae473d9";
 
 const state = {
   tab: "overview"
@@ -407,6 +408,21 @@ function renderLaos() {
     </div>
   `;
 }
+async function fetchFRED(series) {
+  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${series}&api_key=${FRED_API_KEY}&file_type=json`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  const clean = data.observations
+    .filter(d => d.value !== ".") // heq missing
+    .slice(-30);
+
+  return {
+    labels: clean.map(d => d.date.slice(5)),
+    values: clean.map(d => Number(d.value))
+  };
+}
 
 function lineChart(id, labels, data, label) {
   new Chart(document.getElementById(id), {
@@ -449,11 +465,36 @@ function barChart(id, labels, data, label) {
 }
 
 function drawGlobalCharts() {
-  lineChart("brentChart",
-    ["Feb-05","Feb-26","Mar-02","Mar-09","Mar-14","Mar-19","Mar-23"],
-    [68,69,85,94,102,110,97],
-    "Brent"
-  );
+async function drawBrent() {
+  const data = await fetchFRED("DCOILBRENTEU");
+
+  new Chart(document.getElementById("brentChart"), {
+    type: "line",
+    data: {
+      labels: data.labels,
+      datasets: [{
+        data: data.values,
+        borderWidth: 2,
+        tension: 0.35,
+        pointRadius: 0,
+        pointHoverRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => `${ctx.parsed.y} USD/bbl`
+          }
+        }
+      }
+    }
+  });
+}
 
   lineChart("spreadChart",
     ["Feb-05","Feb-26","Mar-02","Mar-09","Mar-14","Mar-19","Mar-23"],
