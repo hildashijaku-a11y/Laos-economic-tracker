@@ -1,47 +1,275 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Laos Economic Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }
+    .eyebrow {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: 34px;
+      line-height: 1.15;
+    }
+    .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.5;
+      max-width: 860px;
+    }
+    .updated {
+      margin-top: 16px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+    .metric-card, .chart-card, .note-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .metric-card { padding: 18px; }
+    .metric-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .metric-value {
+      font-size: 30px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .metric-note {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .chart-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+    .chart-card {
+      padding: 20px;
+    }
+    .chart-card.wide {
+      grid-column: 1 / -1;
+    }
+    .card-title {
+      margin: 0 0 4px;
+      font-size: 20px;
+    }
+    .card-subtitle {
+      margin: 0 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 300px;
+    }
+    .chart-card.wide .chart-wrap {
+      height: 340px;
+    }
+    .note-card {
+      margin-top: 22px;
+      padding: 22px;
+    }
+    .note-card h3 {
+      margin: 0 0 10px;
+      font-size: 20px;
+    }
+    .note-card p, .note-card li {
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    .note-card ul {
+      margin: 10px 0 0 18px;
+      padding: 0;
+    }
+    @media (max-width: 920px) {
+      .metric-grid { grid-template-columns: repeat(2, 1fr); }
+      .chart-grid { grid-template-columns: 1fr; }
+      .chart-card.wide { grid-column: auto; }
+    }
+    @media (max-width: 560px) {
+      .metric-grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+    }
+  </style>
 </head>
-<body style="font-family: Arial; padding: 24px; max-width: 900px; margin: auto;">
+<body>
+  <div class="container">
+    <section class="hero">
+      <div class="eyebrow">Macroeconomic Monitor</div>
+      <h1>🇱🇦 Laos Economic Tracker</h1>
+      <p class="subtitle">
+        A simple public dashboard tracking selected macro indicators for Lao PDR.
+      </p>
+      <div class="updated">Last updated: March 2026</div>
+    </section>
 
-  <h1>🇱🇦 Laos Economic Tracker</h1>
-  <p>Simple dashboard for selected macro indicators.</p>
+    <section class="metric-grid">
+      <div class="metric-card">
+        <div class="metric-label">Inflation</div>
+        <div class="metric-value">6.5%</div>
+        <div class="metric-note">Latest reading</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Exchange Rate</div>
+        <div class="metric-value">21,900</div>
+        <div class="metric-note">LAK per USD</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Growth</div>
+        <div class="metric-value">4.2%</div>
+        <div class="metric-note">Annual estimate</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Reserves</div>
+        <div class="metric-value">4.0</div>
+        <div class="metric-note">Months of imports</div>
+      </div>
+    </section>
 
-  <h3>Inflation (%)</h3>
-  <canvas id="inflationChart"></canvas>
+    <section class="chart-grid">
+      <div class="chart-card">
+        <h2 class="card-title">Inflation Trend</h2>
+        <p class="card-subtitle">Monthly headline inflation.</p>
+        <div class="chart-wrap">
+          <canvas id="inflationChart"></canvas>
+        </div>
+      </div>
 
-  <h3 style="margin-top:40px;">Exchange Rate (LAK/USD)</h3>
-  <canvas id="fxChart"></canvas>
+      <div class="chart-card">
+        <h2 class="card-title">Exchange Rate</h2>
+        <p class="card-subtitle">LAK per USD.</p>
+        <div class="chart-wrap">
+          <canvas id="fxChart"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card wide">
+        <h2 class="card-title">Growth and Reserves</h2>
+        <p class="card-subtitle">Illustrative annual trends.</p>
+        <div class="chart-wrap">
+          <canvas id="growthChart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section class="note-card">
+      <h3>What to watch</h3>
+      <ul>
+        <li>Inflation continues to moderate.</li>
+        <li>The exchange rate remains broadly stable.</li>
+        <li>Reserves are gradually improving.</li>
+      </ul>
+    </section>
+  </div>
 
   <script>
-    const inflationData = {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
-      datasets: [{
-        label: "Inflation %",
-        data: [8.5, 7.9, 7.2, 6.8, 6.5]
-      }]
-    };
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
 
     new Chart(document.getElementById("inflationChart"), {
       type: "line",
-      data: inflationData
+      data: {
+        labels: months,
+        datasets: [{
+          label: "Inflation %",
+          data: [8.5, 7.9, 7.2, 6.8, 6.6, 6.5],
+          tension: 0.35,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     });
-
-    const fxData = {
-      labels: ["Jan", "Feb", "Mar", "Apr", "May"],
-      datasets: [{
-        label: "LAK/USD",
-        data: [21000, 21300, 21550, 21700, 21900]
-      }]
-    };
 
     new Chart(document.getElementById("fxChart"), {
       type: "line",
-      data: fxData
+      data: {
+        labels: months,
+        datasets: [{
+          label: "LAK/USD",
+          data: [21000, 21300, 21550, 21700, 21800, 21900],
+          tension: 0.35,
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
+
+    new Chart(document.getElementById("growthChart"), {
+      type: "bar",
+      data: {
+        labels: ["2022", "2023", "2024", "2025", "2026"],
+        datasets: [
+          {
+            label: "Growth %",
+            data: [2.7, 3.8, 4.1, 4.2, 4.0]
+          },
+          {
+            label: "Reserves (months of imports)",
+            data: [1.3, 2.1, 3.0, 3.8, 4.0]
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
     });
   </script>
-
 </body>
 </html>
