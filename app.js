@@ -1,332 +1,544 @@
 const root = document.getElementById("root");
 
+const state = {
+  tab: "overview"
+};
+
 const styles = `
+  :root{
+    --text:#111827;
+    --muted:#667085;
+    --border:#d9dde5;
+    --bg:#f5f6f8;
+    --card:#fbfbfc;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--text);
+    background: #ffffff;
+  }
+
   .page {
-    max-width: 1200px;
+    max-width: 1220px;
     margin: 0 auto;
-    padding: 32px 20px 60px;
-    color: #111827;
+    padding: 0 18px 40px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 18px;
+    border-bottom: 2px solid #d8dde6;
+    padding-top: 12px;
+    margin-bottom: 18px;
+    overflow-x: auto;
+  }
+
+  .tab {
+    background: none;
+    border: none;
+    padding: 0 0 12px;
+    font: inherit;
+    font-size: 15px;
+    color: #475467;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .tab.active {
+    color: #2f5bea;
+    border-bottom: 2px solid #2f5bea;
+    margin-bottom: -2px;
+    font-weight: 600;
+  }
+
+  .top-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 16px 0 8px;
+    flex-wrap: wrap;
+  }
+
+  .top-label {
+    font-size: 14px;
+    color: #475467;
+  }
+
+  .pill {
+    border: 1px solid #d0d5dd;
+    background: #fff;
+    color: #344054;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 14px;
+    cursor: default;
+  }
+
+  .pill.active {
+    background: #4363f1;
+    color: white;
+    border-color: #4363f1;
+    font-weight: 600;
   }
 
   .hero {
-    padding: 28px 0 22px;
-    border-bottom: 1px solid #e5e7eb;
-    margin-bottom: 28px;
+    padding: 8px 0 4px;
+    margin-bottom: 10px;
   }
 
   .eyebrow {
     font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #6b7280;
-    margin-bottom: 12px;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 700;
   }
 
   .title {
-    font-size: 40px;
-    line-height: 1.1;
+    font-size: 38px;
+    line-height: 1.08;
     font-weight: 700;
-    margin-bottom: 14px;
-  }
-
-  .subtitle {
-    max-width: 900px;
-    color: #4b5563;
-    font-size: 18px;
-    line-height: 1.6;
     margin-bottom: 12px;
+    max-width: 980px;
   }
 
-  .updated {
-    color: #6b7280;
+  .dek {
+    font-size: 17px;
+    line-height: 1.7;
+    color: #475467;
+    max-width: 980px;
+  }
+
+  .meta {
+    margin-top: 10px;
     font-size: 14px;
+    color: #667085;
   }
 
-  .section {
-    margin-top: 36px;
-  }
-
-  .section h2 {
-    font-size: 24px;
-    margin-bottom: 8px;
-  }
-
-  .section p.section-intro {
-    color: #4b5563;
-    line-height: 1.6;
-    margin-bottom: 18px;
-    max-width: 900px;
-  }
-
-  .cards {
+  .grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: 1fr 1fr;
     gap: 16px;
+    margin-top: 16px;
   }
 
   .card {
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    padding: 18px;
-    background: #fafafa;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px 14px;
   }
 
-  .card-label {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #6b7280;
-    margin-bottom: 10px;
-  }
-
-  .card-value {
-    font-size: 30px;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .card-note {
-    color: #4b5563;
-    font-size: 14px;
-    line-height: 1.5;
-  }
-
-  .takeaways {
-    display: grid;
-    gap: 14px;
-  }
-
-  .takeaway {
-    border-left: 4px solid #111827;
-    padding-left: 14px;
-  }
-
-  .takeaway h3 {
+  .card h3 {
+    margin: 0 0 4px;
     font-size: 17px;
-    margin-bottom: 6px;
-  }
-
-  .takeaway p {
-    color: #4b5563;
-    line-height: 1.6;
-  }
-
-  .charts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  .chart-card {
-    border: 1px solid #e5e7eb;
-    border-radius: 18px;
-    padding: 18px;
-    background: #fff;
-  }
-
-  .chart-card.wide {
-    grid-column: 1 / -1;
-  }
-
-  .chart-title {
-    font-size: 18px;
     font-weight: 700;
-    margin-bottom: 6px;
   }
 
-  .chart-subtitle {
-    color: #6b7280;
+  .card p.sub {
+    margin: 0 0 12px;
     font-size: 14px;
+    color: var(--muted);
     line-height: 1.5;
-    margin-bottom: 16px;
   }
 
   .chart-wrap {
     position: relative;
-    height: 320px;
+    height: 230px;
   }
 
-  .footer-note {
-    margin-top: 36px;
-    padding-top: 18px;
-    border-top: 1px solid #e5e7eb;
-    color: #6b7280;
-    font-size: 14px;
-    line-height: 1.6;
+  .wide .chart-wrap {
+    height: 280px;
+  }
+
+  .source {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .overview-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 18px;
+    margin-top: 16px;
+  }
+
+  .overview-box h2 {
+    margin: 0 0 8px;
+    font-size: 22px;
+  }
+
+  .overview-box p, .overview-box li {
+    line-height: 1.7;
+    color: #475467;
+    font-size: 15px;
+  }
+
+  .overview-box ul {
+    margin: 10px 0 0 18px;
+    padding: 0;
+  }
+
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .kpi {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+  }
+
+  .kpi-label {
+    font-size: 12px;
+    text-transform: uppercase;
+    color: var(--muted);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+    font-weight: 700;
+  }
+
+  .kpi-value {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .kpi-note {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
   }
 
   @media (max-width: 900px) {
-    .cards, .charts {
-      grid-template-columns: 1fr;
-    }
-
-    .chart-card.wide {
-      grid-column: auto;
-    }
-
-    .title {
-      font-size: 32px;
-    }
+    .grid, .kpi-grid { grid-template-columns: 1fr; }
+    .title { font-size: 30px; }
   }
 `;
 
-root.innerHTML = `
-  <style>${styles}</style>
-  <div class="page">
-    <section class="hero">
-      <div class="eyebrow">Laos Macro Tracker</div>
-      <div class="title">🇱🇦 Laos Macroeconomic Monitor</div>
-      <div class="subtitle">
-        A live-style tracker for selected macroeconomic indicators in Lao PDR, focusing on inflation,
-        exchange rate pressures, growth, reserves, and debt-related vulnerabilities.
+function render() {
+  root.innerHTML = `
+    <style>${styles}</style>
+    <div class="page">
+      <div class="tabs">
+        <button class="tab ${state.tab === "overview" ? "active" : ""}" data-tab="overview">Crisis Overview</button>
+        <button class="tab ${state.tab === "global" ? "active" : ""}" data-tab="global">Global Markets</button>
+        <button class="tab ${state.tab === "laos" ? "active" : ""}" data-tab="laos">Laos Impact</button>
       </div>
-      <div class="updated">Last updated: March 2026</div>
-    </section>
 
-    <section class="section">
-      <h2>Overview</h2>
-      <p class="section-intro">
-        This tracker is designed to present key macro signals in a compact, readable format.
-      </p>
-
-      <div class="cards">
-        <div class="card">
-          <div class="card-label">Inflation</div>
-          <div class="card-value">6.5%</div>
-          <div class="card-note">Illustrative latest annual inflation reading.</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Exchange Rate</div>
-          <div class="card-value">21,900</div>
-          <div class="card-note">Illustrative LAK per USD spot level.</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Growth</div>
-          <div class="card-value">4.2%</div>
-          <div class="card-note">Illustrative annual real GDP growth estimate.</div>
-        </div>
-        <div class="card">
-          <div class="card-label">Reserves</div>
-          <div class="card-value">4.0</div>
-          <div class="card-note">Illustrative months of import cover.</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Key Takeaways</h2>
-      <p class="section-intro">
-        A short narrative section makes the page feel more like a tracker and less like a plain dashboard.
-      </p>
-
-      <div class="takeaways">
-        <div class="takeaway">
-          <h3>Inflation pressures are easing, but vulnerabilities remain.</h3>
-          <p>Recent readings suggest moderation, though imported fuel and exchange-rate risks could quickly reverse the trend.</p>
-        </div>
-        <div class="takeaway">
-          <h3>The exchange rate remains a core transmission channel.</h3>
-          <p>Movements in the kip continue to shape inflation, debt servicing costs, and private sector confidence.</p>
-        </div>
-        <div class="takeaway">
-          <h3>Reserve accumulation has improved the near-term buffer.</h3>
-          <p>Even so, debt service pressures and external shocks continue to constrain the macro outlook.</p>
-        </div>
-      </div>
-    </section>
-
-    <section class="section">
-      <h2>Charts</h2>
-      <p class="section-intro">
-        These sample charts can later be replaced with real monthly or annual data.
-      </p>
-
-      <div class="charts">
-        <div class="chart-card">
-          <div class="chart-title">Inflation Trend</div>
-          <div class="chart-subtitle">Illustrative monthly headline inflation.</div>
-          <div class="chart-wrap">
-            <canvas id="inflationChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card">
-          <div class="chart-title">Exchange Rate</div>
-          <div class="chart-subtitle">Illustrative LAK per USD monthly trend.</div>
-          <div class="chart-wrap">
-            <canvas id="fxChart"></canvas>
-          </div>
-        </div>
-
-        <div class="chart-card wide">
-          <div class="chart-title">Growth and Reserves</div>
-          <div class="chart-subtitle">Illustrative annual macro trends.</div>
-          <div class="chart-wrap">
-            <canvas id="growthChart"></canvas>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <div class="footer-note">
-      Prototype version. Replace illustrative values with real data as needed.
+      ${state.tab === "overview" ? renderOverview() : ""}
+      ${state.tab === "global" ? renderGlobal() : ""}
+      ${state.tab === "laos" ? renderLaos() : ""}
     </div>
-  </div>
-`;
+  `;
 
-new Chart(document.getElementById("inflationChart"), {
-  type: "line",
-  data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [{
-      label: "Inflation %",
-      data: [8.5, 7.9, 7.2, 6.8, 6.6, 6.5],
-      tension: 0.35,
-      fill: false
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
+  document.querySelectorAll(".tab").forEach(btn => {
+    btn.addEventListener("click", () => {
+      state.tab = btn.dataset.tab;
+      render();
+    });
+  });
 
-new Chart(document.getElementById("fxChart"), {
-  type: "line",
-  data: {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [{
-      label: "LAK/USD",
-      data: [21000, 21300, 21550, 21700, 21800, 21900],
-      tension: 0.35,
-      fill: false
-    }]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
+  if (state.tab === "global") drawGlobalCharts();
+  if (state.tab === "laos") drawLaosCharts();
+}
 
-new Chart(document.getElementById("growthChart"), {
-  type: "bar",
-  data: {
-    labels: ["2022", "2023", "2024", "2025", "2026"],
-    datasets: [
-      {
-        label: "Growth %",
-        data: [2.7, 3.8, 4.1, 4.2, 4.0]
-      },
-      {
-        label: "Reserves (months of imports)",
-        data: [1.3, 2.1, 3.0, 3.8, 4.0]
-      }
-    ]
-  },
-  options: {
-    responsive: true,
-    maintainAspectRatio: false
-  }
-});
+function renderOverview() {
+  return `
+    <section class="hero">
+      <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
+      <div class="title">How a global oil shock could transmit through Laos</div>
+      <div class="dek">
+        This tracker monitors the main channels through which higher oil prices could affect Lao PDR:
+        imported fuel costs, domestic pump prices, inflation, the exchange rate, and external buffers.
+        It is structured as a monitoring page, separating the global shock from its country-level effects.
+      </div>
+      <div class="meta">Last updated: March 2026 • Prototype with illustrative data</div>
+    </section>
+
+    <div class="overview-box">
+      <h2>Why this matters</h2>
+      <p>
+        Laos is a net fuel importer, which means a sustained increase in global oil prices can quickly
+        raise import costs and domestic fuel prices. If this coincides with exchange-rate pressure,
+        the inflationary effect can be amplified and macroeconomic buffers can come under additional strain.
+      </p>
+      <ul>
+        <li>Global oil prices are the external shock.</li>
+        <li>Fuel costs and the exchange rate are the main transmission channels.</li>
+        <li>Inflation, reserves, and macro stability reflect the country-level impact.</li>
+      </ul>
+    </div>
+
+    <div class="kpi-grid">
+      <div class="kpi">
+        <div class="kpi-label">Brent</div>
+        <div class="kpi-value">US$92</div>
+        <div class="kpi-note">Illustrative global oil benchmark.</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Pump fuel prices</div>
+        <div class="kpi-value">+14%</div>
+        <div class="kpi-note">Illustrative domestic pass-through.</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">LAK/USD</div>
+        <div class="kpi-value">22,300</div>
+        <div class="kpi-note">Illustrative exchange-rate stress level.</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Inflation</div>
+        <div class="kpi-value">8.1%</div>
+        <div class="kpi-note">Illustrative headline inflation outcome.</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderGlobal() {
+  return `
+    <div class="top-controls">
+      <div class="top-label">Date range:</div>
+      <button class="pill active">Feb 1 →</button>
+      <button class="pill">All data</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Brent Crude — 2026</h3>
+        <p class="sub">Price trajectory from pre-shock baseline through the oil shock scenario.</p>
+        <div class="chart-wrap"><canvas id="brentChart"></canvas></div>
+        <div class="source">Source: Market data / Laos tracker prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>Brent-WTI Spread</h3>
+        <p class="sub">Illustrative widening under Middle East supply disruption.</p>
+        <div class="chart-wrap"><canvas id="spreadChart"></canvas></div>
+        <div class="source">Source: Calculated / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>US Natural Gas</h3>
+        <p class="sub">Henry Hub proxy for broader energy market tension.</p>
+        <div class="chart-wrap"><canvas id="gasChart"></canvas></div>
+        <div class="source">Source: Market data / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>VIX (Volatility Index)</h3>
+        <p class="sub">Equity fear gauge; higher readings signal broader uncertainty.</p>
+        <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
+        <div class="source">Source: CBOE / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>Gold Price</h3>
+        <p class="sub">Safe-haven demand under geopolitical stress.</p>
+        <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
+        <div class="source">Source: Market data / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>Global Supply Chain Pressure</h3>
+        <p class="sub">Illustrative logistics bottleneck index under stress.</p>
+        <div class="chart-wrap"><canvas id="gscpChart"></canvas></div>
+        <div class="source">Source: Prototype estimate</div>
+      </div>
+    </div>
+  `;
+}
+
+function renderLaos() {
+  return `
+    <div class="top-controls">
+      <div class="top-label">Date range:</div>
+      <button class="pill active">Shock window</button>
+      <button class="pill">All data</button>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <h3>Retail Fuel Price Index</h3>
+        <p class="sub">Illustrative domestic pass-through from global oil prices.</p>
+        <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
+        <div class="source">Source: Laos fuel monitoring / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>LAK/USD Exchange Rate</h3>
+        <p class="sub">Exchange-rate stress can amplify imported inflation.</p>
+        <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
+        <div class="source">Source: BoL / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>Headline Inflation</h3>
+        <p class="sub">Illustrative inflation response under an oil shock scenario.</p>
+        <div class="chart-wrap"><canvas id="inflationChart"></canvas></div>
+        <div class="source">Source: Lao Statistics Bureau / prototype</div>
+      </div>
+
+      <div class="card">
+        <h3>Reserve Cover</h3>
+        <p class="sub">External buffers become more valuable during imported fuel stress.</p>
+        <div class="chart-wrap"><canvas id="reservesChart"></canvas></div>
+        <div class="source">Source: BoL / prototype</div>
+      </div>
+
+      <div class="card wide">
+        <h3>Oil shock transmission to Laos</h3>
+        <p class="sub">Illustrative summary of the core macro transmission channels.</p>
+        <div class="chart-wrap"><canvas id="transmissionChart"></canvas></div>
+        <div class="source">Source: Staff construction / prototype</div>
+      </div>
+    </div>
+  `;
+}
+
+function lineChart(id, labels, data, label) {
+  new Chart(document.getElementById(id), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label,
+        data,
+        tension: 0.35,
+        fill: false,
+        borderWidth: 2
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function barChart(id, labels, data, label) {
+  new Chart(document.getElementById(id), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label,
+        data,
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+function drawGlobalCharts() {
+  lineChart("brentChart",
+    ["Feb-05","Feb-26","Mar-02","Mar-09","Mar-14","Mar-19","Mar-23"],
+    [68,69,85,94,102,110,97],
+    "Brent"
+  );
+
+  lineChart("spreadChart",
+    ["Feb-05","Feb-26","Mar-02","Mar-09","Mar-14","Mar-19","Mar-23"],
+    [9,9,11,12,5,17,8],
+    "Spread"
+  );
+
+  lineChart("gasChart",
+    ["Jan-15","Feb-01","Feb-15","Feb-28","Mar-07","Mar-14","Mar-21","Mar-23"],
+    [2.94,2.97,2.99,3.14,3.10,3.11,3.16,3.07],
+    "US Gas"
+  );
+
+  lineChart("vixChart",
+    ["Jan-15","Feb-01","Feb-15","Feb-28","Mar-07","Mar-14","Mar-20","Mar-24"],
+    [15.2,14.8,15.4,22.3,28.1,26.0,23.8,25.1],
+    "VIX"
+  );
+
+  lineChart("goldChart",
+    ["Jan-15","Feb-01","Feb-15","Feb-28","Mar-07","Mar-14","Mar-19","Mar-23","Mar-24"],
+    [4200,4380,5100,4800,4760,4880,4520,4610,4380],
+    "Gold"
+  );
+
+  barChart("gscpChart",
+    ["Jan","Feb","Mar (est.)"],
+    [0.8,1.1,3.5],
+    "Pressure"
+  );
+}
+
+function drawLaosCharts() {
+  barChart("fuelChart",
+    ["Jan","Feb","Mar","Apr","May","Jun"],
+    [100,102,105,109,112,114],
+    "Fuel"
+  );
+
+  lineChart("fxChart",
+    ["Jan","Feb","Mar","Apr","May","Jun"],
+    [21600,21750,21820,22000,22150,22300],
+    "FX"
+  );
+
+  lineChart("inflationChart",
+    ["Jan","Feb","Mar","Apr","May","Jun"],
+    [6.4,6.6,6.9,7.3,7.7,8.1],
+    "Inflation"
+  );
+
+  lineChart("reservesChart",
+    ["2023","2024","2025","2026"],
+    [2.1,3.0,3.8,3.4],
+    "Reserves"
+  );
+
+  new Chart(document.getElementById("transmissionChart"), {
+    type: "bar",
+    data: {
+      labels: ["Oil price", "Fuel imports", "FX pressure", "Inflation", "Buffers"],
+      datasets: [{
+        label: "Shock intensity",
+        data: [100, 118, 112, 121, 86],
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } }
+    }
+  });
+}
+
+render();
+
+Pastaj:
+
+bëj Commit changes
+hape faqen me:
+https://hildashijaku-a11y.github.io/Laos-economic-tracker/?v=7
+
+Nëse do, hapi pas këtij është ta bëjmë edhe më afër:
+
+butonat të duken tamam si ai
+charts me threshold lines
+një tab të katërt: Asia Comparison ose Scenario Monitor.
