@@ -1,8 +1,10 @@
-import csv
 import json
+import os
 from datetime import datetime
-from io import StringIO
+from urllib.parse import urlencode
 from urllib.request import urlopen
+
+API_KEY = os.environ["FRED_API_KEY"]
 
 SERIES = {
     "brent": "DCOILBRENTEU",
@@ -12,44 +14,29 @@ SERIES = {
 }
 
 def fetch_series(series_id):
-    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    params = urlencode({
+        "series_id": series_id,
+        "api_key": API_KEY,
+        "file_type": "json",
+        "sort_order": "asc",
+    })
+    url = f"https://api.stlouisfed.org/fred/series/observations?{params}"
 
     with urlopen(url) as response:
-        text = response.read().decode("utf-8")
+        data = json.load(response)
 
-    reader = csv.reader(StringIO(text))
-    rows = list(reader)
+    observations = data.get("observations", [])
+    if not observations:
+        raise ValueError(f"No observations returned for {series_id}: {data}")
 
-    if len(rows) < 2:
-        raise ValueError(f"No data returned for {series_id}")
-
-    header = rows[0]
-    data_rows = rows[1:]
-
-    if len(header) < 2:
-        raise ValueError(f"Unexpected CSV format for {series_id}: {header}")
-
-    labels = []
-    values = []
-
-    for row in data_rows:
-        if len(row) < 2:
-            continue
-        date = row[0]
-        value = row[1]
-
-        if value in (".", "", None):
-            continue
-
-        labels.append(date)
-        values.append(float(value))
-
-    labels = labels[-60:]
-    values = values[-60:]
+    clean = [
+        x for x in observations
+        if x.get("value") not in (".", "", None)
+    ][-60:]
 
     return {
-        "labels": labels,
-        "values": values,
+        "labels": [x["date"] for x in clean],
+        "values": [float(x["value"]) for x in clean],
     }
 
 def main():
@@ -59,7 +46,7 @@ def main():
 
     out["_meta"] = {
         "updated_at_utc": datetime.utcnow().isoformat() + "Z",
-        "source": "FRED CSV"
+        "source": "FRED API"
     }
 
     with open("market-data.json", "w", encoding="utf-8") as f:
