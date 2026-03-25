@@ -171,9 +171,8 @@ function render() {
               <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
               <div class="title">Global market indicators</div>
              <div class="dek">
-  Laos remains highly vulnerable to global fuel price shocks, reflecting its dependence on imported energy and constrained foreign exchange buffers. External price increases rapidly feed into domestic inflation, exchange rate pressures, and fiscal stress.
-
-  This tracker follows global oil markets alongside key domestic transmission channels—fuel prices, inflation, and the exchange rate—to monitor how external shocks propagate through the Lao economy in real time.
+ Brent crude fell to ~$99/bbl and WTI to ~$90.67 on March 24 — continuing the sharp retreat triggered by Trump's postponement of strikes on Iranian energy infrastructure — as risk assets rebounded broadly (S&P 500 +1.4%). VIX eased further to 24.85. Gold slipped to ~$4,320/oz, now down ~23% from the January all-time high of $5,594. Laos fuel prices unchanged since Mar 23 (RON95: 42390 LAK/L; diesel: 40570 LAK/L). Hormuz transits remain near zero. The Strait remains effectively closed on Day 25.
+— Crisis Monitoring Unit · March 24, 2026
 </div>
               <div class="meta">Source: Google Sheets live</div>
             </section>
