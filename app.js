@@ -530,15 +530,3 @@ function drawLaosCharts() {
 }
 
 render();
-
-Pastaj:
-
-bëj Commit changes
-hape faqen me:
-https://hildashijaku-a11y.github.io/Laos-economic-tracker/?v=7
-
-Nëse do, hapi pas këtij është ta bëjmë edhe më afër:
-
-butonat të duken tamam si ai
-charts me threshold lines
-një tab të katërt: Asia Comparison ose Scenario Monitor.
