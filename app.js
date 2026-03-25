@@ -170,9 +170,11 @@ function render() {
             <section class="hero">
               <div class="eyebrow">Oil Shock — Laos Impact Tracker</div>
               <div class="title">Global market indicators</div>
-              <div class="dek">
-                Live global indicators feeding the oil shock monitor.
-              </div>
+             <div class="dek">
+  Laos remains highly vulnerable to global fuel price shocks, reflecting its dependence on imported energy and constrained foreign exchange buffers. External price increases rapidly feed into domestic inflation, exchange rate pressures, and fiscal stress.
+
+  This tracker follows global oil markets alongside key domestic transmission channels—fuel prices, inflation, and the exchange rate—to monitor how external shocks propagate through the Lao economy in real time.
+</div>
               <div class="meta">Source: Google Sheets live</div>
             </section>
 
