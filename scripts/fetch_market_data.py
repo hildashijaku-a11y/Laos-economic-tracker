@@ -1,10 +1,8 @@
+import csv
 import json
-import os
 from datetime import datetime
+from io import StringIO
 from urllib.request import urlopen
-from urllib.parse import urlencode
-
-API_KEY = os.environ["FRED_API_KEY"]
 
 SERIES = {
     "brent": "DCOILBRENTEU",
@@ -14,24 +12,19 @@ SERIES = {
 }
 
 def fetch_series(series_id):
-    params = urlencode({
-        "series_id": series_id,
-        "api_key": API_KEY,
-        "file_type": "json",
-        "sort_order": "asc"
-    })
-    url = f"https://api.stlouisfed.org/fred/series/observations?{params}"
-    with urlopen(url) as response:
-        data = json.load(response)
+    url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
 
-    obs = [
-        x for x in data.get("observations", [])
-        if x.get("value") not in (".", None, "")
-    ][-60:]
+    with urlopen(url) as response:
+        text = response.read().decode("utf-8")
+
+    reader = csv.DictReader(StringIO(text))
+    rows = [r for r in reader if r["VALUE"] not in (".", "", None)]
+
+    rows = rows[-60:]
 
     return {
-        "labels": [x["date"] for x in obs],
-        "values": [float(x["value"]) for x in obs],
+        "labels": [r["DATE"] for r in rows],
+        "values": [float(r["VALUE"]) for r in rows],
     }
 
 def main():
@@ -41,7 +34,7 @@ def main():
 
     out["_meta"] = {
         "updated_at_utc": datetime.utcnow().isoformat() + "Z",
-        "source": "FRED"
+        "source": "FRED CSV"
     }
 
     with open("market-data.json", "w", encoding="utf-8") as f:
