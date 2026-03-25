@@ -399,7 +399,9 @@ function renderLaos() {
 }
 
 async function fetchFRED(seriesId) {
-  const url = `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`;
+  `https://api.allorigins.win/raw?url=${encodeURIComponent(
+  `https://api.stlouisfed.org/fred/series/observations?series_id=${seriesId}&api_key=${FRED_API_KEY}&file_type=json`
+)}`;
 
   const res = await fetch(url);
   const data = await res.json();
