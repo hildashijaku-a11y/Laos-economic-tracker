@@ -82,18 +82,139 @@ root.innerHTML = `
         <div id="fuelError" class="error"></div>
       </div>
 
-      <div class="card">
-        <div><strong>Inflation</strong></div>
-        <div class="sub">Date and value</div>
-        <div class="chart-wrap">
-          <canvas id="cpiChart"></canvas>
-        </div>
-        <div id="cpiError" class="error"></div>
-      </div>
-    </div>
+     <div class="card">
+  <div><strong>Inflation</strong></div>
+  <div class="sub">Headline, core, non-core, raw food, fuel</div>
+  <div class="chart-wrap">
+    <canvas id="cpiChart"></canvas>
   </div>
+  <div id="cpiError" class="error"></div>
+</div>
 `;
+async function fetchInflation(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Fetch failed");
 
+  const text = await res.text();
+  const rows = text.trim().split("\n").slice(1);
+
+  const labels = [];
+  const headline = [];
+  const core = [];
+  const nonCore = [];
+  const rawFood = [];
+  const fuel = [];
+
+  for (const row of rows) {
+    const cols = row.split(",");
+    if (cols.length < 6) continue;
+
+    const date = cols[0].replace(/"/g, "").trim();
+    const h = parseFloat(cols[1].replace(/"/g, "").replace(/,/g, "").trim());
+    const c = parseFloat(cols[2].replace(/"/g, "").replace(/,/g, "").trim());
+    const n = parseFloat(cols[3].replace(/"/g, "").replace(/,/g, "").trim());
+    const r = parseFloat(cols[4].replace(/"/g, "").replace(/,/g, "").trim());
+    const f = parseFloat(cols[5].replace(/"/g, "").replace(/,/g, "").trim());
+
+    if (
+      !date ||
+      Number.isNaN(h) ||
+      Number.isNaN(c) ||
+      Number.isNaN(n) ||
+      Number.isNaN(r) ||
+      Number.isNaN(f)
+    ) continue;
+
+    labels.push(date);
+    headline.push(h);
+    core.push(c);
+    nonCore.push(n);
+    rawFood.push(r);
+    fuel.push(f);
+  }
+
+  return { labels, headline, core, nonCore, rawFood, fuel };
+}
+
+function drawInflationChart(labels, headline, core, nonCore, rawFood, fuel) {
+  new Chart(document.getElementById("cpiChart"), {
+    type: "line",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: "Headline inflation",
+          data: headline,
+          borderWidth: 2,
+          tension: 0.25,
+          pointRadius: 0
+        },
+        {
+          label: "Core inflation",
+          data: core,
+          borderWidth: 2,
+          tension: 0.25,
+          pointRadius: 0
+        },
+        {
+          label: "Non-core inflation",
+          data: nonCore,
+          borderWidth: 2,
+          tension: 0.25,
+          pointRadius: 0
+        },
+        {
+          label: "Raw food inflation",
+          data: rawFood,
+          borderWidth: 2,
+          tension: 0.25,
+          pointRadius: 0
+        },
+        {
+          label: "Fuel inflation",
+          data: fuel,
+          borderWidth: 2,
+          tension: 0.25,
+          pointRadius: 0
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxTicksLimit: 6 }
+        },
+        y: {
+          grid: { color: "#e5e7eb" }
+        }
+      }
+    }
+  });
+}
+
+async function initCPI() {
+  try {
+    const data = await fetchInflation(CPI_CSV);
+    drawInflationChart(
+      data.labels,
+      data.headline,
+      data.core,
+      data.nonCore,
+      data.rawFood,
+      data.fuel
+    );
+  } catch (e) {
+    console.error(e);
+    document.getElementById("cpiError").textContent =
+      "Could not load inflation data.";
+  }
+}
 async function fetchSeries(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
