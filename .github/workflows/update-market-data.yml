@@ -1,4 +1,4 @@
-name: Update market data
+name: Update market data v2
 
 on:
   workflow_dispatch:
