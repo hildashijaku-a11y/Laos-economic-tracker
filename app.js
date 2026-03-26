@@ -2,35 +2,30 @@ const root = document.getElementById("root");
 
 let activeTab = "global";
 
-const HORMUZ_OIL_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1332311442";
+const SHEET_BASE =
+  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=";
 
-const HORMUZ_TIMELINE_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=30458749";
-
-const LAOS_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=158156900";
-
-const FUEL_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=96401015";
-
-const CPI_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1526208390";
-
-const RESERVES_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=864450268";
-
-const TEXT_CSV =
-  "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=1254341027";
+const URLS = {
+  hormuzOil: `${SHEET_BASE}1332311442`,
+  hormuzTimeline: `${SHEET_BASE}30458749`,
+  laosFx: `${SHEET_BASE}158156900`,
+  fuel: `${SHEET_BASE}96401015`,
+  inflation: `${SHEET_BASE}1526208390`,
+  reserves: `${SHEET_BASE}864450268`,
+  overallText: `${SHEET_BASE}1254341027`,
+  gold: `${SHEET_BASE}1619011895`,
+  vix: `${SHEET_BASE}1068023263`,
+  shipping: `${SHEET_BASE}907185380`,
+};
 
 const styles = `
   :root{
     --text:#111827;
     --muted:#667085;
     --border:#d9dde5;
-    --bg:#f5f6f8;
     --blue:#2f5bea;
     --card:#f8f9fb;
+    --bg:#ffffff;
   }
 
   * { box-sizing: border-box; }
@@ -38,8 +33,8 @@ const styles = `
   body {
     margin: 0;
     font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
     color: var(--text);
-    background: #ffffff;
   }
 
   .page {
@@ -49,7 +44,7 @@ const styles = `
   }
 
   .hero {
-    padding: 18px 0 10px;
+    padding: 20px 0 10px;
   }
 
   .eyebrow {
@@ -57,16 +52,15 @@ const styles = `
     text-transform: uppercase;
     letter-spacing: 0.08em;
     color: var(--muted);
-    margin-bottom: 8px;
     font-weight: 700;
+    margin-bottom: 8px;
   }
 
   .title {
+    margin: 0 0 12px;
     font-size: 42px;
     line-height: 1.05;
     font-weight: 700;
-    margin: 0 0 12px;
-    max-width: 980px;
   }
 
   .dek {
@@ -79,7 +73,7 @@ const styles = `
   .meta {
     margin-top: 10px;
     font-size: 14px;
-    color: #667085;
+    color: var(--muted);
   }
 
   .overall-grid {
@@ -96,56 +90,10 @@ const styles = `
     gap: 14px;
   }
 
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 18px;
-  }
-
-  .card h3 {
-    margin: 0 0 6px;
-    font-size: 17px;
-    font-weight: 700;
-  }
-
-  .sub {
-    margin: 0 0 14px;
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.5;
-  }
-
-  .kpi-label {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .kpi-value {
-    font-size: 30px;
-    line-height: 1;
-    font-weight: 700;
-    margin-bottom: 6px;
-  }
-
-  .kpi-date {
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  .free-text {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #344054;
-    white-space: pre-wrap;
-  }
-
   .tabs {
     display: flex;
     gap: 18px;
     border-bottom: 2px solid #d8dde6;
-    padding-top: 2px;
     margin-bottom: 18px;
   }
 
@@ -171,6 +119,59 @@ const styles = `
     grid-template-columns: 1fr 1fr;
     gap: 16px;
     margin-top: 16px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 18px;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
+  }
+
+  .card:hover {
+    transform: translateY(-2px);
+    border-color: #c7d2e4;
+    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+  }
+
+  .card h3 {
+    margin: 0 0 6px;
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  .sub {
+    margin: 0 0 14px;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .free-text {
+    font-size: 16px;
+    line-height: 1.7;
+    color: #344054;
+    white-space: pre-wrap;
+  }
+
+  .kpi-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 30px;
+    line-height: 1;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .kpi-date {
+    font-size: 13px;
+    color: var(--muted);
   }
 
   .chart-wrap {
@@ -214,15 +215,47 @@ const styles = `
 
   .timeline-event {
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 400;
     margin-bottom: 8px;
-    line-height: 1.45;
+    line-height: 1.5;
   }
 
   .timeline-impact {
     font-size: 14px;
     color: #475467;
     line-height: 1.6;
+  }
+
+  .shipping-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin-top: 12px;
+  }
+
+  .shipping-stat {
+    background: #fbfcfe;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px;
+  }
+
+  .shipping-label {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .shipping-value {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .shipping-note {
+    font-size: 13px;
+    color: #475467;
+    line-height: 1.5;
   }
 
   .footer-note {
@@ -239,13 +272,16 @@ const styles = `
   }
 
   @media (max-width: 980px) {
-    .overall-grid,
-    .grid {
+    .overall-grid, .grid {
       grid-template-columns: 1fr;
     }
 
     .kpi-grid {
       grid-template-columns: 1fr 1fr;
+    }
+
+    .shipping-grid {
+      grid-template-columns: 1fr;
     }
 
     .title {
@@ -271,13 +307,11 @@ function render() {
           A compact dashboard for monitoring global oil disruption signals, Laos transmission channels,
           and crisis developments over time.
         </div>
-        <div class="meta">Last update: 26 March, 2026.</div>
       </section>
 
       <section class="overall-grid">
         <div class="card">
           <h3>Overview</h3>
-          <p class="sub">Impact and key transmission channels</p>
           <div id="overallText" class="free-text">Loading...</div>
           <div id="overallTextError" class="error"></div>
         </div>
@@ -315,12 +349,10 @@ function render() {
         <button class="tab ${activeTab === "timeline" ? "active" : ""}" id="tab-timeline">Crisis Timeline</button>
       </div>
 
-      <section id="tabContent">
-        ${renderTabContent()}
-      </section>
+      <section id="tabContent">${renderTabContent()}</section>
 
       <div class="footer-note">
-        Hormuztracker.com. Laos macro indicators are drawn from national sources.
+        Source note: HormuzTracker for disruption and oil-market content; Laos indicators compiled from national sources.
       </div>
     </div>
   `;
@@ -344,7 +376,7 @@ function render() {
 
   if (activeTab === "global") initGlobal();
   if (activeTab === "laos") initLaos();
-  if (activeTab === "timeline") initTimeline();
+  if (activeTab === "timeline") initTimelineTab();
 }
 
 function renderTabContent() {
@@ -366,17 +398,17 @@ function renderTabContent() {
         </div>
 
         <div class="card">
-          <h3>EU gas (TTF)</h3>
-          <p class="sub">Hormuz oil sheet</p>
-          <div class="chart-wrap"><canvas id="ttfChart"></canvas></div>
-          <div id="ttfError" class="error"></div>
+          <h3>Gold</h3>
+          <p class="sub">Global market indicator</p>
+          <div class="chart-wrap"><canvas id="goldChart"></canvas></div>
+          <div id="goldError" class="error"></div>
         </div>
 
         <div class="card">
-          <h3>US gasoline</h3>
-          <p class="sub">Hormuz oil sheet</p>
-          <div class="chart-wrap"><canvas id="usGasChart"></canvas></div>
-          <div id="usGasError" class="error"></div>
+          <h3>VIX</h3>
+          <p class="sub">Global volatility</p>
+          <div class="chart-wrap"><canvas id="vixChart"></canvas></div>
+          <div id="vixError" class="error"></div>
         </div>
       </div>
     `;
@@ -417,20 +449,26 @@ function renderTabContent() {
   }
 
   return `
-    <div class="card">
-      <h3>Crisis Timeline</h3>
-      <p class="sub">Events and impacts from your Hormuz timeline sheet</p>
-      <div id="timeline" class="timeline">Loading...</div>
-      <div id="timelineError" class="error"></div>
+    <div class="grid">
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Crisis Timeline</h3>
+        <p class="sub">Events and impacts from your Hormuz timeline sheet</p>
+        <div id="timeline" class="timeline">Loading...</div>
+        <div id="timelineError" class="error"></div>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>Shipping</h3>
+        <p class="sub">Shipping disruption indicators</p>
+        <div id="shippingPanel">Loading...</div>
+        <div id="shippingError" class="error"></div>
+      </div>
     </div>
   `;
 }
 
 function parseCSV(text) {
-  return text
-    .trim()
-    .split("\n")
-    .map((row) => row.split(","));
+  return text.trim().split("\n").map(row => row.split(","));
 }
 
 function parseNum(value) {
@@ -490,6 +528,55 @@ function latestNonNull(labels, values) {
     }
   }
   return { label: "", value: null };
+}
+
+function singleDataset(label, values) {
+  return [{
+    label,
+    data: values,
+    borderWidth: 2,
+    tension: 0.25,
+    pointRadius: 0,
+    spanGaps: true
+  }];
+}
+
+function multiDataset(series) {
+  return series.map(item => ({
+    label: item.label,
+    data: item.data,
+    borderWidth: 2,
+    tension: 0.25,
+    pointRadius: 0,
+    spanGaps: true
+  }));
+}
+
+function makeLineChart(canvasId, labels, datasets, maxTicksLimit = 6) {
+  new Chart(document.getElementById(canvasId), {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: "index",
+        intersect: false
+      },
+      plugins: {
+        legend: { display: datasets.length > 1 }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxTicksLimit }
+        },
+        y: {
+          grid: { color: "#e5e7eb" }
+        }
+      }
+    }
+  });
 }
 
 async function fetchSingleSeries(url) {
@@ -619,6 +706,7 @@ async function fetchHormuzOil(url) {
 
   return { labels, brent, wti, ttf, usGasoline };
 }
+
 async function fetchTextBlock(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
@@ -644,77 +732,41 @@ async function fetchTimeline(url) {
   const eventIdx = headers.findIndex(h => h === "event" || h.includes("event"));
   const impactIdx = headers.findIndex(h => h === "impact" || h.includes("impact"));
 
-  return body
-    .map(row => ({
-      day: (row[dayIdx] || "").replace(/"/g, "").trim(),
-      date: (row[dateIdx] || "").replace(/"/g, "").trim(),
-      event: (row[eventIdx] || "").replace(/"/g, "").trim(),
-      impact: (row[impactIdx] || "").replace(/"/g, "").trim()
-    }))
-    .filter(item => item.day || item.date || item.event || item.impact);
+  return body.map(row => ({
+    day: (row[dayIdx] || "").replace(/"/g, "").trim(),
+    date: (row[dateIdx] || "").replace(/"/g, "").trim(),
+    event: (row[eventIdx] || "").replace(/"/g, "").trim(),
+    impact: (row[impactIdx] || "").replace(/"/g, "").trim()
+  })).filter(item => item.day || item.date || item.event || item.impact);
 }
 
-function makeLineChart(canvasId, labels, datasets, maxTicksLimit = 6) {
-  new Chart(document.getElementById(canvasId), {
-    type: "line",
-    data: { labels, datasets },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      interaction: {
-        mode: "index",
-        intersect: false
-      },
-      plugins: {
-        legend: {
-          display: datasets.length > 1
-        }
-      },
-      scales: {
-        x: {
-          grid: { display: false },
-          ticks: { maxTicksLimit }
-        },
-        y: {
-          grid: { color: "#e5e7eb" }
-        }
-      }
-    }
-  });
-}
+async function fetchShipping(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error("Fetch failed");
 
-function singleDataset(label, values) {
-  return [{
-    label,
-    data: values,
-    borderWidth: 2,
-    tension: 0.25,
-    pointRadius: 0,
-    spanGaps: true
-  }];
-}
+  const rows = parseCSV(await res.text());
+  const headers = rows[0].map(h => (h || "").replace(/"/g, "").toLowerCase().trim());
+  const body = rows.slice(1);
 
-function multiDataset(series) {
-  return series.map(item => ({
-    label: item.label,
-    data: item.data,
-    borderWidth: 2,
-    tension: 0.25,
-    pointRadius: 0,
-    spanGaps: true
-  }));
+  return body.map(row => {
+    const item = {};
+    headers.forEach((h, i) => {
+      item[h] = (row[i] || "").replace(/"/g, "").trim();
+    });
+    return item;
+  }).filter(item => Object.values(item).some(Boolean));
 }
 
 async function initOverall() {
   try {
-    const text = await fetchTextBlock(TEXT_CSV);
+    const text = await fetchTextBlock(URLS.overallText);
     document.getElementById("overallText").textContent = text || "No text found.";
-  } catch (e) {
-    document.getElementById("overallTextError").textContent = "Could not load overall text.";
+  } catch {
+    document.getElementById("overallTextError").textContent = "Could not load overview text.";
   }
 
   try {
-    const oil = await fetchHormuzOil(HORMUZ_OIL_CSV);
+    const oil = await fetchHormuzOil(URLS.hormuzOil);
     const filtered = filterFromThisJanuary(oil.labels, oil.brent);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiBrent").textContent = formatValue(latest.value, 1);
@@ -724,7 +776,7 @@ async function initOverall() {
   }
 
   try {
-    const fx = await fetchSingleSeries(LAOS_CSV);
+    const fx = await fetchSingleSeries(URLS.laosFx);
     const filtered = filterFromThisJanuary(fx.labels, fx.values);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiFx").textContent = formatValue(latest.value, 0);
@@ -734,7 +786,7 @@ async function initOverall() {
   }
 
   try {
-    const cpi = await fetchInflation(CPI_CSV);
+    const cpi = await fetchInflation(URLS.inflation);
     const filtered = filterFromThisJanuary(cpi.labels, cpi.headline);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiCpi").textContent = formatValue(latest.value, 1, "%");
@@ -744,7 +796,7 @@ async function initOverall() {
   }
 
   try {
-    const reserves = await fetchSingleSeries(RESERVES_CSV);
+    const reserves = await fetchSingleSeries(URLS.reserves);
     const filtered = filterFromThisJanuary(reserves.labels, reserves.values);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiReserves").textContent = formatValue(latest.value, 0);
@@ -756,27 +808,39 @@ async function initOverall() {
 
 async function initGlobal() {
   try {
-    const oil = await fetchHormuzOil(HORMUZ_OIL_CSV);
+    const oil = await fetchHormuzOil(URLS.hormuzOil);
     const brentFiltered = filterFromThisJanuary(oil.labels, oil.brent);
     const wtiFiltered = filterFromThisJanuary(oil.labels, oil.wti);
-    const ttfFiltered = filterFromThisJanuary(oil.labels, oil.ttf);
-    const gasFiltered = filterFromThisJanuary(oil.labels, oil.usGasoline);
 
     makeLineChart("brentChart", brentFiltered.labels, singleDataset("Brent", brentFiltered.series[0]));
     makeLineChart("wtiChart", wtiFiltered.labels, singleDataset("WTI", wtiFiltered.series[0]));
-    makeLineChart("ttfChart", ttfFiltered.labels, singleDataset("TTF", ttfFiltered.series[0]));
-    makeLineChart("usGasChart", gasFiltered.labels, singleDataset("US gasoline", gasFiltered.series[0]));
-  } catch (e) {
-    ["brentError", "wtiError", "ttfError", "usGasError"].forEach(id => {
+  } catch {
+    ["brentError", "wtiError"].forEach(id => {
       const el = document.getElementById(id);
-      if (el) el.textContent = "Could not load global data.";
+      if (el) el.textContent = "Could not load oil data.";
     });
+  }
+
+  try {
+    const gold = await fetchSingleSeries(URLS.gold);
+    const filtered = filterFromThisJanuary(gold.labels, gold.values);
+    makeLineChart("goldChart", filtered.labels, singleDataset("Gold", filtered.series[0]));
+  } catch {
+    document.getElementById("goldError").textContent = "Could not load gold data.";
+  }
+
+  try {
+    const vix = await fetchSingleSeries(URLS.vix);
+    const filtered = filterFromThisJanuary(vix.labels, vix.values);
+    makeLineChart("vixChart", filtered.labels, singleDataset("VIX", filtered.series[0]));
+  } catch {
+    document.getElementById("vixError").textContent = "Could not load VIX data.";
   }
 }
 
 async function initLaos() {
   try {
-    const fx = await fetchSingleSeries(LAOS_CSV);
+    const fx = await fetchSingleSeries(URLS.laosFx);
     const filtered = filterFromThisJanuary(fx.labels, fx.values);
     makeLineChart("fxChart", filtered.labels, singleDataset("KIP / USD", filtered.series[0]));
   } catch {
@@ -784,7 +848,7 @@ async function initLaos() {
   }
 
   try {
-    const reserves = await fetchSingleSeries(RESERVES_CSV);
+    const reserves = await fetchSingleSeries(URLS.reserves);
     const filtered = filterFromThisJanuary(reserves.labels, reserves.values);
     makeLineChart("reservesChart", filtered.labels, singleDataset("Foreign reserves", filtered.series[0]));
   } catch {
@@ -792,7 +856,7 @@ async function initLaos() {
   }
 
   try {
-    const fuel = await fetchFuel(FUEL_CSV);
+    const fuel = await fetchFuel(URLS.fuel);
     const filtered = filterFromThisJanuary(fuel.labels, fuel.diesel, fuel.gasoline);
     makeLineChart(
       "fuelChart",
@@ -807,7 +871,7 @@ async function initLaos() {
   }
 
   try {
-    const cpi = await fetchInflation(CPI_CSV);
+    const cpi = await fetchInflation(URLS.inflation);
     const filtered = filterFromThisJanuary(
       cpi.labels,
       cpi.headline,
@@ -834,32 +898,62 @@ async function initLaos() {
   }
 }
 
-async function initTimeline() {
+async function initTimelineTab() {
   try {
-    const items = await fetchTimeline(HORMUZ_TIMELINE_CSV);
+    const items = await fetchTimeline(URLS.hormuzTimeline);
     const target = document.getElementById("timeline");
 
     if (!items.length) {
       target.innerHTML = "No timeline data found.";
+    } else {
+      target.innerHTML = items
+        .slice()
+        .reverse()
+        .map(item => `
+          <div class="timeline-item">
+            <div class="timeline-top">
+              <div class="timeline-day">${item.day || ""}</div>
+              <div class="timeline-date">${item.date || ""}</div>
+            </div>
+            <div class="timeline-event">${item.event || ""}</div>
+            <div class="timeline-impact">${item.impact || ""}</div>
+          </div>
+        `)
+        .join("");
+    }
+  } catch {
+    document.getElementById("timelineError").textContent = "Could not load timeline data.";
+  }
+
+  try {
+    const shipping = await fetchShipping(URLS.shipping);
+    const panel = document.getElementById("shippingPanel");
+
+    if (!shipping.length) {
+      panel.innerHTML = "No shipping data found.";
       return;
     }
 
-    target.innerHTML = items
-      .slice()
-      .reverse()
-      .map(item => `
-        <div class="timeline-item">
-          <div class="timeline-top">
-            <div class="timeline-day">${item.day || ""}</div>
-            <div class="timeline-date">${item.date || ""}</div>
-          </div>
-          <div class="timeline-event">${item.event || ""}</div>
-          <div class="timeline-impact">${item.impact || ""}</div>
-        </div>
-      `)
-      .join("");
+    panel.innerHTML = `
+      <div class="shipping-grid">
+        ${shipping.slice(0, 6).map(item => {
+          const entries = Object.entries(item).filter(([_, v]) => v);
+          const title = entries[0]?.[1] || "Metric";
+          const value = entries[1]?.[1] || "—";
+          const note = entries.slice(2).map(([_, v]) => v).join(" · ");
+
+          return `
+            <div class="shipping-stat">
+              <div class="shipping-label">${title}</div>
+              <div class="shipping-value">${value}</div>
+              <div class="shipping-note">${note}</div>
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
   } catch {
-    document.getElementById("timelineError").textContent = "Could not load timeline data.";
+    document.getElementById("shippingError").textContent = "Could not load shipping data.";
   }
 }
 
