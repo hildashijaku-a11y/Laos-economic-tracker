@@ -1,6 +1,6 @@
 const root = document.getElementById("root");
 
-let activeTab = "global";
+let activeTab = "crisis";
 
 const SHEET_BASE =
   "https://docs.google.com/spreadsheets/d/1F_44fLFdzRz2LDWD9JSFJ3VutU4jbYM5bG7P654m-Dc/export?format=csv&gid=";
@@ -15,25 +15,31 @@ const URLS = {
   overallText: `${SHEET_BASE}1254341027`,
   gold: `${SHEET_BASE}1619011895`,
   vix: `${SHEET_BASE}1068023263`,
-  shipping: `${SHEET_BASE}907185380`,
 };
 
 const styles = `
   :root{
-    --text:#111827;
-    --muted:#667085;
-    --border:#d9dde5;
-    --blue:#2f5bea;
-    --card:#f8f9fb;
-    --bg:#ffffff;
+    --bg: #f6f1e7;
+    --page: #fbf8f2;
+    --card: #f2ebdf;
+    --card-2: #f8f4ec;
+    --border: #d8ccbb;
+    --text: #223042;
+    --muted: #6b7688;
+    --blue: #5f7ea3;
+    --blue-dark: #385777;
+    --sand: #c8a87a;
+    --shadow: 0 10px 30px rgba(60, 75, 95, 0.08);
   }
 
-  * { box-sizing: border-box; }
+  * {
+    box-sizing: border-box;
+  }
 
   body {
     margin: 0;
     font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
+    background: linear-gradient(180deg, #eef4f8 0%, var(--bg) 22%, var(--page) 100%);
     color: var(--text);
   }
 
@@ -61,12 +67,13 @@ const styles = `
     font-size: 42px;
     line-height: 1.05;
     font-weight: 700;
+    color: var(--text);
   }
 
   .dek {
     font-size: 17px;
     line-height: 1.7;
-    color: #475467;
+    color: #516072;
     max-width: 980px;
   }
 
@@ -92,8 +99,8 @@ const styles = `
 
   .tabs {
     display: flex;
-    gap: 18px;
-    border-bottom: 2px solid #d8dde6;
+    gap: 24px;
+    border-bottom: 1px solid #cfbfab;
     margin-bottom: 18px;
   }
 
@@ -103,15 +110,15 @@ const styles = `
     padding: 0 0 12px;
     font: inherit;
     font-size: 15px;
-    color: #475467;
+    color: #637187;
     cursor: pointer;
   }
 
   .tab.active {
-    color: var(--blue);
+    color: var(--blue-dark);
     border-bottom: 2px solid var(--blue);
-    margin-bottom: -2px;
-    font-weight: 600;
+    margin-bottom: -1px;
+    font-weight: 700;
   }
 
   .grid {
@@ -121,25 +128,33 @@ const styles = `
     margin-top: 16px;
   }
 
+  .crisis-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
   .card {
-    background: var(--card);
+    background: linear-gradient(180deg, var(--card-2) 0%, var(--card) 100%);
     border: 1px solid var(--border);
-    border-radius: 16px;
+    border-radius: 18px;
     padding: 18px;
+    box-shadow: var(--shadow);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
-    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04);
   }
 
   .card:hover {
     transform: translateY(-2px);
-    border-color: #c7d2e4;
-    box-shadow: 0 10px 24px rgba(16, 24, 40, 0.08);
+    box-shadow: 0 14px 34px rgba(60, 75, 95, 0.11);
+    border-color: #cbb89e;
   }
 
   .card h3 {
     margin: 0 0 6px;
     font-size: 17px;
     font-weight: 700;
+    color: var(--text);
   }
 
   .sub {
@@ -152,7 +167,7 @@ const styles = `
   .free-text {
     font-size: 16px;
     line-height: 1.7;
-    color: #344054;
+    color: #334155;
     white-space: pre-wrap;
   }
 
@@ -167,6 +182,7 @@ const styles = `
     line-height: 1;
     font-weight: 700;
     margin-bottom: 6px;
+    color: var(--blue-dark);
   }
 
   .kpi-date {
@@ -176,86 +192,62 @@ const styles = `
 
   .chart-wrap {
     position: relative;
-    height: 280px;
+    height: 285px;
   }
 
-  .timeline {
-    display: grid;
-    gap: 14px;
-    margin-top: 8px;
-  }
-
-  .timeline-item {
-    background: #fbfcfe;
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 16px 18px;
-  }
-
-  .timeline-top {
+  .iframe-center {
     display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    align-items: baseline;
-    margin-bottom: 8px;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 4px;
   }
 
-  .timeline-day {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--blue);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
+  .timeline-scroll {
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 8px;
+    border-top: 1px solid #ded3c4;
+    margin-top: 6px;
+  }
+
+  .timeline-scroll::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  .timeline-scroll::-webkit-scrollbar-track {
+    background: #eee6d9;
+    border-radius: 999px;
+  }
+
+  .timeline-scroll::-webkit-scrollbar-thumb {
+    background: #9aa7b6;
+    border-radius: 999px;
+  }
+
+  .timeline-row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd1c0;
   }
 
   .timeline-date {
     font-size: 13px;
-    color: var(--muted);
-  }
-
-  .timeline-event {
-    font-size: 16px;
-    font-weight: 400;
-    margin-bottom: 8px;
-    line-height: 1.5;
-  }
-
-  .timeline-impact {
-    font-size: 14px;
-    color: #475467;
-    line-height: 1.6;
-  }
-
-  .shipping-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    margin-top: 12px;
-  }
-
-  .shipping-stat {
-    background: #fbfcfe;
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 16px;
-  }
-
-  .shipping-label {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .shipping-value {
-    font-size: 20px;
     font-weight: 700;
-    margin-bottom: 6px;
+    color: #4f70c0;
   }
 
-  .shipping-note {
-    font-size: 13px;
-    color: #475467;
-    line-height: 1.5;
+  .timeline-text {
+    font-size: 14px;
+    line-height: 1.55;
+    color: #334155;
+  }
+
+  .source-note {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
   }
 
   .footer-note {
@@ -272,16 +264,14 @@ const styles = `
   }
 
   @media (max-width: 980px) {
-    .overall-grid, .grid {
+    .overall-grid,
+    .grid,
+    .crisis-grid {
       grid-template-columns: 1fr;
     }
 
     .kpi-grid {
       grid-template-columns: 1fr 1fr;
-    }
-
-    .shipping-grid {
-      grid-template-columns: 1fr;
     }
 
     .title {
@@ -292,6 +282,11 @@ const styles = `
   @media (max-width: 640px) {
     .kpi-grid {
       grid-template-columns: 1fr;
+    }
+
+    .timeline-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
     }
   }
 `;
@@ -312,6 +307,7 @@ function render() {
       <section class="overall-grid">
         <div class="card">
           <h3>Overview</h3>
+          <p class="sub">Impact and key transmission channels</p>
           <div id="overallText" class="free-text">Loading...</div>
           <div id="overallTextError" class="error"></div>
         </div>
@@ -344,9 +340,9 @@ function render() {
       </section>
 
       <div class="tabs">
+        <button class="tab ${activeTab === "crisis" ? "active" : ""}" id="tab-crisis">Crisis Overview</button>
         <button class="tab ${activeTab === "global" ? "active" : ""}" id="tab-global">Global</button>
         <button class="tab ${activeTab === "laos" ? "active" : ""}" id="tab-laos">Laos</button>
-        <button class="tab ${activeTab === "timeline" ? "active" : ""}" id="tab-timeline">Crisis Timeline</button>
       </div>
 
       <section id="tabContent">${renderTabContent()}</section>
@@ -356,6 +352,11 @@ function render() {
       </div>
     </div>
   `;
+
+  document.getElementById("tab-crisis").onclick = () => {
+    activeTab = "crisis";
+    render();
+  };
 
   document.getElementById("tab-global").onclick = () => {
     activeTab = "global";
@@ -367,19 +368,70 @@ function render() {
     render();
   };
 
-  document.getElementById("tab-timeline").onclick = () => {
-    activeTab = "timeline";
-    render();
-  };
-
   initOverall();
 
+  if (activeTab === "crisis") initCrisisOverview();
   if (activeTab === "global") initGlobal();
   if (activeTab === "laos") initLaos();
-  if (activeTab === "timeline") initTimelineTab();
 }
 
 function renderTabContent() {
+  if (activeTab === "crisis") {
+    return `
+      <div class="crisis-grid">
+        <div class="card">
+          <h3>Crisis Severity</h3>
+          <p class="sub">HormuzTracker live badge</p>
+          <div class="iframe-center">
+            <iframe
+              src="https://www.hormuztracker.com/embed?widget=badge"
+              width="220"
+              height="80"
+              frameborder="0"
+              style="border:0; overflow:hidden;">
+            </iframe>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Ship Count</h3>
+          <p class="sub">Live ship transit count with comparison to baseline</p>
+          <div class="iframe-center">
+            <iframe
+              src="https://www.hormuztracker.com/embed?widget=ships"
+              width="300"
+              height="200"
+              frameborder="0"
+              style="border:0; overflow:hidden;">
+            </iframe>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Oil Prices</h3>
+          <p class="sub">Brent, WTI, TTF and gasoline</p>
+          <div class="iframe-center">
+            <iframe
+              src="https://www.hormuztracker.com/embed?widget=oil"
+              width="300"
+              height="400"
+              frameborder="0"
+              style="border:0; overflow:hidden;">
+            </iframe>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Crisis Timeline</h3>
+          <p class="sub">Key events since Feb 28.</p>
+          <div id="timelineScroll" class="timeline-scroll">Loading...</div>
+          <div class="source-note">Source: HormuzTracker + verified news.</div>
+          <div id="timelineError" class="error"></div>
+        </div>
+      </div>
+    `;
+  }
+
   if (activeTab === "global") {
     return `
       <div class="grid">
@@ -414,72 +466,80 @@ function renderTabContent() {
     `;
   }
 
-  if (activeTab === "laos") {
-    return `
-      <div class="grid">
-        <div class="card">
-          <h3>KIP / USD</h3>
-          <p class="sub">Exchange rate</p>
-          <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
-          <div id="fxError" class="error"></div>
-        </div>
-
-        <div class="card">
-          <h3>Foreign reserves</h3>
-          <p class="sub">USD million</p>
-          <div class="chart-wrap"><canvas id="reservesChart"></canvas></div>
-          <div id="reservesError" class="error"></div>
-        </div>
-
-        <div class="card">
-          <h3>Fuel prices</h3>
-          <p class="sub">Diesel and gasoline</p>
-          <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
-          <div id="fuelError" class="error"></div>
-        </div>
-
-        <div class="card" style="grid-column: 1 / -1;">
-          <h3>Inflation</h3>
-          <p class="sub">Headline, core, non-core, raw food, fuel</p>
-          <div class="chart-wrap"><canvas id="cpiChart"></canvas></div>
-          <div id="cpiError" class="error"></div>
-        </div>
-      </div>
-    `;
-  }
-
   return `
     <div class="grid">
-      <div class="card" style="grid-column: 1 / -1;">
-        <h3>Crisis Timeline</h3>
-        <p class="sub">Events and impacts from your Hormuz timeline sheet</p>
-        <div id="timeline" class="timeline">Loading...</div>
-        <div id="timelineError" class="error"></div>
+      <div class="card">
+        <h3>KIP / USD</h3>
+        <p class="sub">Exchange rate</p>
+        <div class="chart-wrap"><canvas id="fxChart"></canvas></div>
+        <div id="fxError" class="error"></div>
+      </div>
+
+      <div class="card">
+        <h3>Foreign reserves</h3>
+        <p class="sub">USD million</p>
+        <div class="chart-wrap"><canvas id="reservesChart"></canvas></div>
+        <div id="reservesError" class="error"></div>
+      </div>
+
+      <div class="card">
+        <h3>Fuel prices</h3>
+        <p class="sub">Diesel and gasoline</p>
+        <div class="chart-wrap"><canvas id="fuelChart"></canvas></div>
+        <div id="fuelError" class="error"></div>
       </div>
 
       <div class="card" style="grid-column: 1 / -1;">
-        <h3>Shipping</h3>
-        <p class="sub">Shipping disruption indicators</p>
-        <div id="shippingPanel">Loading...</div>
-        <div id="shippingError" class="error"></div>
+        <h3>Inflation</h3>
+        <p class="sub">Headline, core, non-core, raw food, fuel</p>
+        <div class="chart-wrap"><canvas id="cpiChart"></canvas></div>
+        <div id="cpiError" class="error"></div>
       </div>
     </div>
   `;
 }
 
 function parseCSV(text) {
-  return text.trim().split("\n").map(row => row.split(","));
+  const rows = [];
+  let row = [];
+  let cell = "";
+  let inQuotes = false;
+
+  for (let i = 0; i < text.length; i++) {
+    const char = text[i];
+    const next = text[i + 1];
+
+    if (char === '"') {
+      if (inQuotes && next === '"') {
+        cell += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (char === "," && !inQuotes) {
+      row.push(cell);
+      cell = "";
+    } else if ((char === "\n" || char === "\r") && !inQuotes) {
+      if (char === "\r" && next === "\n") i++;
+      row.push(cell);
+      rows.push(row);
+      row = [];
+      cell = "";
+    } else {
+      cell += char;
+    }
+  }
+
+  row.push(cell);
+  rows.push(row);
+
+  return rows.filter(r => !(r.length === 1 && r[0] === ""));
 }
 
 function parseNum(value) {
   const cleaned = (value || "").replace(/"/g, "").replace(/,/g, "").trim();
   const num = parseFloat(cleaned);
   return Number.isNaN(num) ? null : num;
-}
-
-function getCurrentYearStart() {
-  const now = new Date();
-  return new Date(now.getFullYear(), 0, 1);
 }
 
 function parseDateLoose(label) {
@@ -499,7 +559,7 @@ function parseDateLoose(label) {
 }
 
 function filterFromThisJanuary(labels, ...seriesArrays) {
-  const jan1 = getCurrentYearStart();
+  const jan1 = new Date(new Date().getFullYear(), 0, 1);
   const keep = [];
 
   labels.forEach((label, i) => {
@@ -572,7 +632,7 @@ function makeLineChart(canvasId, labels, datasets, maxTicksLimit = 6) {
           ticks: { maxTicksLimit }
         },
         y: {
-          grid: { color: "#e5e7eb" }
+          grid: { color: "#ddd2c3" }
         }
       }
     }
@@ -711,12 +771,10 @@ async function fetchTextBlock(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
 
-  const text = await res.text();
-  const rows = text.trim().split("\n");
-
+  const rows = parseCSV(await res.text());
   if (rows.length < 2) return "";
 
-  return rows.slice(1).join("\n").replace(/"/g, "").trim();
+  return rows.slice(1).map(r => (r[0] || "").trim()).filter(Boolean).join("\n\n");
 }
 
 async function fetchTimeline(url) {
@@ -727,34 +785,15 @@ async function fetchTimeline(url) {
   const headers = rows[0].map(h => (h || "").replace(/"/g, "").toLowerCase().trim());
   const body = rows.slice(1);
 
-  const dayIdx = headers.findIndex(h => h === "day" || h.includes("day"));
   const dateIdx = headers.findIndex(h => h === "date" || h.includes("date"));
   const eventIdx = headers.findIndex(h => h === "event" || h.includes("event"));
-  const impactIdx = headers.findIndex(h => h === "impact" || h.includes("impact"));
 
-  return body.map(row => ({
-    day: (row[dayIdx] || "").replace(/"/g, "").trim(),
-    date: (row[dateIdx] || "").replace(/"/g, "").trim(),
-    event: (row[eventIdx] || "").replace(/"/g, "").trim(),
-    impact: (row[impactIdx] || "").replace(/"/g, "").trim()
-  })).filter(item => item.day || item.date || item.event || item.impact);
-}
-
-async function fetchShipping(url) {
-  const res = await fetch(url);
-  if (!res.ok) throw new Error("Fetch failed");
-
-  const rows = parseCSV(await res.text());
-  const headers = rows[0].map(h => (h || "").replace(/"/g, "").toLowerCase().trim());
-  const body = rows.slice(1);
-
-  return body.map(row => {
-    const item = {};
-    headers.forEach((h, i) => {
-      item[h] = (row[i] || "").replace(/"/g, "").trim();
-    });
-    return item;
-  }).filter(item => Object.values(item).some(Boolean));
+  return body
+    .map(row => ({
+      date: (row[dateIdx] || "").replace(/"/g, "").trim(),
+      event: (row[eventIdx] || "").replace(/"/g, "").trim()
+    }))
+    .filter(item => item.date || item.event);
 }
 
 async function initOverall() {
@@ -806,6 +845,31 @@ async function initOverall() {
   }
 }
 
+async function initCrisisOverview() {
+  try {
+    const items = await fetchTimeline(URLS.hormuzTimeline);
+    const target = document.getElementById("timelineScroll");
+
+    if (!items.length) {
+      target.innerHTML = "No timeline data found.";
+      return;
+    }
+
+    target.innerHTML = items
+      .slice()
+      .reverse()
+      .map(item => `
+        <div class="timeline-row">
+          <div class="timeline-date">${item.date || ""}</div>
+          <div class="timeline-text">${item.event || ""}</div>
+        </div>
+      `)
+      .join("");
+  } catch {
+    document.getElementById("timelineError").textContent = "Could not load timeline data.";
+  }
+}
+
 async function initGlobal() {
   try {
     const oil = await fetchHormuzOil(URLS.hormuzOil);
@@ -815,10 +879,8 @@ async function initGlobal() {
     makeLineChart("brentChart", brentFiltered.labels, singleDataset("Brent", brentFiltered.series[0]));
     makeLineChart("wtiChart", wtiFiltered.labels, singleDataset("WTI", wtiFiltered.series[0]));
   } catch {
-    ["brentError", "wtiError"].forEach(id => {
-      const el = document.getElementById(id);
-      if (el) el.textContent = "Could not load oil data.";
-    });
+    document.getElementById("brentError").textContent = "Could not load oil data.";
+    document.getElementById("wtiError").textContent = "Could not load oil data.";
   }
 
   try {
@@ -895,65 +957,6 @@ async function initLaos() {
     );
   } catch {
     document.getElementById("cpiError").textContent = "Could not load inflation data.";
-  }
-}
-
-async function initTimelineTab() {
-  try {
-    const items = await fetchTimeline(URLS.hormuzTimeline);
-    const target = document.getElementById("timeline");
-
-    if (!items.length) {
-      target.innerHTML = "No timeline data found.";
-    } else {
-      target.innerHTML = items
-        .slice()
-        .reverse()
-        .map(item => `
-          <div class="timeline-item">
-            <div class="timeline-top">
-              <div class="timeline-day">${item.day || ""}</div>
-              <div class="timeline-date">${item.date || ""}</div>
-            </div>
-            <div class="timeline-event">${item.event || ""}</div>
-            <div class="timeline-impact">${item.impact || ""}</div>
-          </div>
-        `)
-        .join("");
-    }
-  } catch {
-    document.getElementById("timelineError").textContent = "Could not load timeline data.";
-  }
-
-  try {
-    const shipping = await fetchShipping(URLS.shipping);
-    const panel = document.getElementById("shippingPanel");
-
-    if (!shipping.length) {
-      panel.innerHTML = "No shipping data found.";
-      return;
-    }
-
-    panel.innerHTML = `
-      <div class="shipping-grid">
-        ${shipping.slice(0, 6).map(item => {
-          const entries = Object.entries(item).filter(([_, v]) => v);
-          const title = entries[0]?.[1] || "Metric";
-          const value = entries[1]?.[1] || "—";
-          const note = entries.slice(2).map(([_, v]) => v).join(" · ");
-
-          return `
-            <div class="shipping-stat">
-              <div class="shipping-label">${title}</div>
-              <div class="shipping-value">${value}</div>
-              <div class="shipping-note">${note}</div>
-            </div>
-          `;
-        }).join("")}
-      </div>
-    `;
-  } catch {
-    document.getElementById("shippingError").textContent = "Could not load shipping data.";
   }
 }
 
