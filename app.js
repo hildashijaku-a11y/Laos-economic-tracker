@@ -8,38 +8,55 @@ const SHEET_BASE =
 const URLS = {
   hormuzOil: `${SHEET_BASE}1332311442`,
   hormuzTimeline: `${SHEET_BASE}30458749`,
+  shipsTransit: `${SHEET_BASE}907185380`,
+
   laosFx: `${SHEET_BASE}158156900`,
+  reserves: `${SHEET_BASE}864450268`,
   fuel: `${SHEET_BASE}96401015`,
   inflation: `${SHEET_BASE}1526208390`,
-  reserves: `${SHEET_BASE}864450268`,
+  laosTimeline: `${SHEET_BASE}1672038515`,
+
   overallText: `${SHEET_BASE}1254341027`,
   gold: `${SHEET_BASE}1619011895`,
   vix: `${SHEET_BASE}1068023263`,
 };
 
+const COLORS = {
+  text: "#223042",
+  muted: "#6b7688",
+  border: "#d8ccbb",
+  blue: "#6e8cab",
+  blueDark: "#415f80",
+  sand: "#c59d6f",
+  rust: "#c1694f",
+  slate: "#7a8796",
+  bg1: "#eef4f8",
+  bg2: "#f6f1e7",
+  page: "#fbf8f2",
+  card1: "#f8f4ec",
+  card2: "#f2ebdf",
+};
+
 const styles = `
   :root{
-    --bg: #f6f1e7;
-    --page: #fbf8f2;
-    --card: #f2ebdf;
-    --card-2: #f8f4ec;
-    --border: #d8ccbb;
-    --text: #223042;
-    --muted: #6b7688;
-    --blue: #5f7ea3;
-    --blue-dark: #385777;
-    --sand: #c8a87a;
-    --shadow: 0 10px 30px rgba(60, 75, 95, 0.08);
+    --text:${COLORS.text};
+    --muted:${COLORS.muted};
+    --border:${COLORS.border};
+    --blue:${COLORS.blue};
+    --blue-dark:${COLORS.blueDark};
+    --sand:${COLORS.sand};
+    --rust:${COLORS.rust};
+    --page:${COLORS.page};
+    --card-a:${COLORS.card1};
+    --card-b:${COLORS.card2};
   }
 
-  * {
-    box-sizing: border-box;
-  }
+  * { box-sizing: border-box; }
 
   body {
     margin: 0;
     font-family: 'DM Sans', sans-serif;
-    background: linear-gradient(180deg, #eef4f8 0%, var(--bg) 22%, var(--page) 100%);
+    background: linear-gradient(180deg, ${COLORS.bg1} 0%, ${COLORS.bg2} 24%, ${COLORS.page} 100%);
     color: var(--text);
   }
 
@@ -67,7 +84,6 @@ const styles = `
     font-size: 42px;
     line-height: 1.05;
     font-weight: 700;
-    color: var(--text);
   }
 
   .dek {
@@ -75,12 +91,6 @@ const styles = `
     line-height: 1.7;
     color: #516072;
     max-width: 980px;
-  }
-
-  .meta {
-    margin-top: 10px;
-    font-size: 14px;
-    color: var(--muted);
   }
 
   .overall-grid {
@@ -128,7 +138,7 @@ const styles = `
     margin-top: 16px;
   }
 
-  .crisis-grid {
+  .laos-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 16px;
@@ -136,11 +146,11 @@ const styles = `
   }
 
   .card {
-    background: linear-gradient(180deg, var(--card-2) 0%, var(--card) 100%);
+    background: linear-gradient(180deg, var(--card-a) 0%, var(--card-b) 100%);
     border: 1px solid var(--border);
     border-radius: 18px;
     padding: 18px;
-    box-shadow: var(--shadow);
+    box-shadow: 0 10px 30px rgba(60, 75, 95, 0.08);
     transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
   }
 
@@ -154,7 +164,6 @@ const styles = `
     margin: 0 0 6px;
     font-size: 17px;
     font-weight: 700;
-    color: var(--text);
   }
 
   .sub {
@@ -203,7 +212,7 @@ const styles = `
   }
 
   .timeline-scroll {
-    max-height: 250px;
+    max-height: 255px;
     overflow-y: auto;
     padding-right: 8px;
     border-top: 1px solid #ded3c4;
@@ -250,6 +259,38 @@ const styles = `
     color: var(--muted);
   }
 
+  .oil-summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 8px;
+  }
+
+  .oil-box {
+    background: #f7f1e7;
+    border: 1px solid #dccfbd;
+    border-radius: 14px;
+    padding: 14px;
+  }
+
+  .oil-name {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .oil-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--sand);
+    margin-bottom: 4px;
+  }
+
+  .oil-change {
+    font-size: 13px;
+    color: var(--rust);
+  }
+
   .footer-note {
     margin-top: 24px;
     font-size: 13px;
@@ -266,7 +307,7 @@ const styles = `
   @media (max-width: 980px) {
     .overall-grid,
     .grid,
-    .crisis-grid {
+    .laos-grid {
       grid-template-columns: 1fr;
     }
 
@@ -287,6 +328,10 @@ const styles = `
     .timeline-row {
       grid-template-columns: 1fr;
       gap: 6px;
+    }
+
+    .oil-summary-grid {
+      grid-template-columns: 1fr;
     }
   }
 `;
@@ -378,47 +423,35 @@ function render() {
 function renderTabContent() {
   if (activeTab === "crisis") {
     return `
-      <div class="crisis-grid">
+      <div class="grid">
         <div class="card">
           <h3>Crisis Severity</h3>
           <p class="sub">HormuzTracker live badge</p>
           <div class="iframe-center">
-            <iframe
-              src="https://www.hormuztracker.com/embed?widget=badge"
-              width="220"
-              height="80"
-              frameborder="0"
-              style="border:0; overflow:hidden;">
-            </iframe>
+            <div style="width:170px; height:62px; overflow:hidden; border-radius:12px;">
+              <iframe
+                src="https://www.hormuztracker.com/embed?widget=badge"
+                width="220"
+                height="80"
+                frameborder="0"
+                style="border:0; transform: scale(0.77); transform-origin: top left;">
+              </iframe>
+            </div>
           </div>
         </div>
 
         <div class="card">
-          <h3>Ship Count</h3>
-          <p class="sub">Live ship transit count with comparison to baseline</p>
-          <div class="iframe-center">
-            <iframe
-              src="https://www.hormuztracker.com/embed?widget=ships"
-              width="300"
-              height="200"
-              frameborder="0"
-              style="border:0; overflow:hidden;">
-            </iframe>
-          </div>
+          <h3>Strait of Hormuz Ship Transits (daily)</h3>
+          <p class="sub">Ships in transit</p>
+          <div class="chart-wrap"><canvas id="shipsTransitChart"></canvas></div>
+          <div id="shipsTransitError" class="error"></div>
         </div>
 
         <div class="card">
           <h3>Oil Prices</h3>
           <p class="sub">Brent, WTI, TTF and gasoline</p>
-          <div class="iframe-center">
-            <iframe
-              src="https://www.hormuztracker.com/embed?widget=oil"
-              width="300"
-              height="400"
-              frameborder="0"
-              style="border:0; overflow:hidden;">
-            </iframe>
-          </div>
+          <div id="oilSummaryGrid" class="oil-summary-grid">Loading...</div>
+          <div id="oilSummaryError" class="error"></div>
         </div>
 
         <div class="card">
@@ -467,7 +500,7 @@ function renderTabContent() {
   }
 
   return `
-    <div class="grid">
+    <div class="laos-grid">
       <div class="card">
         <h3>KIP / USD</h3>
         <p class="sub">Exchange rate</p>
@@ -489,11 +522,25 @@ function renderTabContent() {
         <div id="fuelError" class="error"></div>
       </div>
 
-      <div class="card" style="grid-column: 1 / -1;">
+      <div class="card">
+        <h3>Domestic vs imported goods inflation</h3>
+        <p class="sub">Two-line comparison</p>
+        <div class="chart-wrap"><canvas id="goodsInflationChart"></canvas></div>
+        <div id="goodsInflationError" class="error"></div>
+      </div>
+
+      <div class="card">
         <h3>Inflation</h3>
         <p class="sub">Headline, core, non-core, raw food, fuel</p>
         <div class="chart-wrap"><canvas id="cpiChart"></canvas></div>
         <div id="cpiError" class="error"></div>
+      </div>
+
+      <div class="card">
+        <h3>Laos timeline</h3>
+        <p class="sub">Policy and market developments</p>
+        <div id="laosTimelineScroll" class="timeline-scroll">Loading...</div>
+        <div id="laosTimelineError" class="error"></div>
       </div>
     </div>
   `;
@@ -573,12 +620,12 @@ function filterFromThisJanuary(labels, ...seriesArrays) {
   };
 }
 
-function formatValue(value, decimals = 1, suffix = "") {
-  if (value === null || value === undefined || Number.isNaN(value)) return "—";
-  return `${Number(value).toLocaleString(undefined, {
-    minimumFractionDigits: decimals,
-    maximumFractionDigits: decimals
-  })}${suffix}`;
+function keepLastN(labels, ...seriesArrays) {
+  const start = Math.max(0, labels.length - 18);
+  return {
+    labels: labels.slice(start),
+    series: seriesArrays.map(arr => arr.slice(start))
+  };
 }
 
 function latestNonNull(labels, values) {
@@ -590,11 +637,21 @@ function latestNonNull(labels, values) {
   return { label: "", value: null };
 }
 
-function singleDataset(label, values) {
+function formatValue(value, decimals = 1, suffix = "") {
+  if (value === null || value === undefined || Number.isNaN(value)) return "—";
+  return `${Number(value).toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  })}${suffix}`;
+}
+
+function singleDataset(label, values, color) {
   return [{
     label,
     data: values,
     borderWidth: 2,
+    borderColor: color,
+    backgroundColor: color,
     tension: 0.25,
     pointRadius: 0,
     spanGaps: true
@@ -606,6 +663,8 @@ function multiDataset(series) {
     label: item.label,
     data: item.data,
     borderWidth: 2,
+    borderColor: item.color,
+    backgroundColor: item.color,
     tension: 0.25,
     pointRadius: 0,
     spanGaps: true
@@ -630,6 +689,73 @@ function makeLineChart(canvasId, labels, datasets, maxTicksLimit = 6) {
         x: {
           grid: { display: false },
           ticks: { maxTicksLimit }
+        },
+        y: {
+          grid: { color: "#ddd2c3" }
+        }
+      }
+    }
+  });
+}
+
+function makeBarChart(canvasId, labels, values, color = COLORS.sand, maxTicksLimit = 8) {
+  new Chart(document.getElementById(canvasId), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        data: values,
+        backgroundColor: color,
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxTicksLimit }
+        },
+        y: {
+          grid: { color: "#ddd2c3" }
+        }
+      }
+    }
+  });
+}
+
+function makeGroupedBarChart(canvasId, labels, seriesA, seriesB, labelA, labelB) {
+  new Chart(document.getElementById(canvasId), {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [
+        {
+          label: labelA,
+          data: seriesA,
+          backgroundColor: COLORS.sand
+        },
+        {
+          label: labelB,
+          data: seriesB,
+          backgroundColor: COLORS.blue
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true }
+      },
+      scales: {
+        x: {
+          grid: { display: false },
+          ticks: { maxTicksLimit: 8 }
         },
         y: {
           grid: { color: "#ddd2c3" }
@@ -670,6 +796,7 @@ async function fetchFuel(url) {
 
   for (const row of rows) {
     if (row.length < 3) continue;
+
     const date = (row[0] || "").replace(/"/g, "").trim();
     const d = parseNum(row[1]);
     const g = parseNum(row[2]);
@@ -684,7 +811,7 @@ async function fetchFuel(url) {
   return { labels, diesel, gasoline };
 }
 
-async function fetchInflation(url) {
+async function fetchInflationWide(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
 
@@ -693,45 +820,42 @@ async function fetchInflation(url) {
   const body = rows.slice(1);
 
   const labels = [];
-  const headline = [];
-  const core = [];
-  const nonCore = [];
-  const rawFood = [];
-  const fuel = [];
+  const data = {
+    headline: [],
+    core: [],
+    nonCore: [],
+    rawFood: [],
+    fuel: [],
+    domesticGoods: [],
+    importedGoods: []
+  };
+
+  const idx = {
+    date: 0,
+    headline: headers.findIndex(h => h.includes("headline")),
+    core: headers.findIndex(h => h.includes("core") && !h.includes("non")),
+    nonCore: headers.findIndex(h => h.includes("non")),
+    rawFood: headers.findIndex(h => h.includes("raw")),
+    fuel: headers.findIndex(h => h.includes("fuel")),
+    domesticGoods: headers.findIndex(h => h.includes("domestic goods")),
+    importedGoods: headers.findIndex(h => h.includes("imported goods"))
+  };
 
   for (const row of body) {
-    const date = (row[0] || "").replace(/"/g, "").trim();
+    const date = (row[idx.date] || "").replace(/"/g, "").trim();
     if (!date) continue;
 
-    const vals = {
-      headline: null,
-      core: null,
-      nonCore: null,
-      rawFood: null,
-      fuel: null
-    };
-
-    for (let i = 1; i < headers.length; i++) {
-      const h = headers[i];
-      const v = parseNum(row[i]);
-      if (v === null) continue;
-
-      if (h.includes("headline")) vals.headline = v;
-      else if (h.includes("core") && !h.includes("non")) vals.core = v;
-      else if (h.includes("non")) vals.nonCore = v;
-      else if (h.includes("raw")) vals.rawFood = v;
-      else if (h.includes("fuel")) vals.fuel = v;
-    }
-
     labels.push(date);
-    headline.push(vals.headline);
-    core.push(vals.core);
-    nonCore.push(vals.nonCore);
-    rawFood.push(vals.rawFood);
-    fuel.push(vals.fuel);
+    data.headline.push(parseNum(row[idx.headline]));
+    data.core.push(parseNum(row[idx.core]));
+    data.nonCore.push(parseNum(row[idx.nonCore]));
+    data.rawFood.push(parseNum(row[idx.rawFood]));
+    data.fuel.push(parseNum(row[idx.fuel]));
+    data.domesticGoods.push(parseNum(row[idx.domesticGoods]));
+    data.importedGoods.push(parseNum(row[idx.importedGoods]));
   }
 
-  return { labels, headline, core, nonCore, rawFood, fuel };
+  return { labels, ...data };
 }
 
 async function fetchHormuzOil(url) {
@@ -751,7 +875,7 @@ async function fetchHormuzOil(url) {
   const brentIdx = headers.findIndex(h => h.includes("brent"));
   const wtiIdx = headers.findIndex(h => h.includes("wti"));
   const ttfIdx = headers.findIndex(h => h.includes("ttf"));
-  const usGasIdx = headers.findIndex(h => h.includes("gasoline"));
+  const gasIdx = headers.findIndex(h => h.includes("gasoline"));
 
   for (const row of body) {
     const date = (row[0] || "").replace(/"/g, "").trim();
@@ -761,7 +885,7 @@ async function fetchHormuzOil(url) {
     brent.push(parseNum(row[brentIdx]));
     wti.push(parseNum(row[wtiIdx]));
     ttf.push(parseNum(row[ttfIdx]));
-    usGasoline.push(parseNum(row[usGasIdx]));
+    usGasoline.push(parseNum(row[gasIdx]));
   }
 
   return { labels, brent, wti, ttf, usGasoline };
@@ -774,7 +898,11 @@ async function fetchTextBlock(url) {
   const rows = parseCSV(await res.text());
   if (rows.length < 2) return "";
 
-  return rows.slice(1).map(r => (r[0] || "").trim()).filter(Boolean).join("\n\n");
+  return rows
+    .slice(1)
+    .map(r => (r[0] || "").trim())
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 async function fetchTimeline(url) {
@@ -786,7 +914,7 @@ async function fetchTimeline(url) {
   const body = rows.slice(1);
 
   const dateIdx = headers.findIndex(h => h === "date" || h.includes("date"));
-  const eventIdx = headers.findIndex(h => h === "event" || h.includes("event"));
+  const eventIdx = headers.findIndex(h => h === "event" || h.includes("event") || h.includes("news") || h.includes("text"));
 
   return body
     .map(row => ({
@@ -794,6 +922,39 @@ async function fetchTimeline(url) {
       event: (row[eventIdx] || "").replace(/"/g, "").trim()
     }))
     .filter(item => item.date || item.event);
+}
+
+function latestAndPrevious(values) {
+  const valid = values.filter(v => v !== null && v !== undefined && !Number.isNaN(v));
+  if (!valid.length) return { latest: null, previous: null };
+  if (valid.length === 1) return { latest: valid[0], previous: null };
+  return {
+    latest: valid[valid.length - 1],
+    previous: valid[valid.length - 2]
+  };
+}
+
+function renderOilSummary(containerId, oil) {
+  const metrics = [
+    { name: "Brent", values: oil.brent, prefix: "$" },
+    { name: "WTI", values: oil.wti, prefix: "$" },
+    { name: "TTF", values: oil.ttf, prefix: "€" },
+    { name: "US gasoline", values: oil.usGasoline, prefix: "$" }
+  ];
+
+  document.getElementById(containerId).innerHTML = metrics.map(m => {
+    const pair = latestAndPrevious(m.values);
+    const diff = pair.latest !== null && pair.previous !== null ? pair.latest - pair.previous : null;
+    const diffText = diff === null ? "—" : `${diff >= 0 ? "+" : ""}${diff.toFixed(2)}`;
+
+    return `
+      <div class="oil-box">
+        <div class="oil-name">${m.name}</div>
+        <div class="oil-value">${m.prefix}${pair.latest !== null ? pair.latest.toFixed(2) : "—"}</div>
+        <div class="oil-change">${diffText}</div>
+      </div>
+    `;
+  }).join("");
 }
 
 async function initOverall() {
@@ -825,8 +986,8 @@ async function initOverall() {
   }
 
   try {
-    const cpi = await fetchInflation(URLS.inflation);
-    const filtered = filterFromThisJanuary(cpi.labels, cpi.headline);
+    const infl = await fetchInflationWide(URLS.inflation);
+    const filtered = keepLastN(infl.labels, infl.headline);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiCpi").textContent = formatValue(latest.value, 1, "%");
     document.getElementById("kpiCpiDate").textContent = latest.label || "No data";
@@ -836,7 +997,7 @@ async function initOverall() {
 
   try {
     const reserves = await fetchSingleSeries(URLS.reserves);
-    const filtered = filterFromThisJanuary(reserves.labels, reserves.values);
+    const filtered = keepLastN(reserves.labels, reserves.values);
     const latest = latestNonNull(filtered.labels, filtered.series[0]);
     document.getElementById("kpiReserves").textContent = formatValue(latest.value, 0);
     document.getElementById("kpiReservesDate").textContent = latest.label || "No data";
@@ -846,6 +1007,34 @@ async function initOverall() {
 }
 
 async function initCrisisOverview() {
+  try {
+    const ships = await fetchSingleSeries(URLS.shipsTransit);
+    const filtered = filterFromThisJanuary(ships.labels, ships.values);
+    makeBarChart("shipsTransitChart", filtered.labels, filtered.series[0], COLORS.sand, 8);
+  } catch {
+    document.getElementById("shipsTransitError").textContent = "Could not load ship transit data.";
+  }
+
+  try {
+    const oil = await fetchHormuzOil(URLS.hormuzOil);
+    const filtered = filterFromThisJanuary(
+      oil.labels,
+      oil.brent,
+      oil.wti,
+      oil.ttf,
+      oil.usGasoline
+    );
+
+    renderOilSummary("oilSummaryGrid", {
+      brent: filtered.series[0],
+      wti: filtered.series[1],
+      ttf: filtered.series[2],
+      usGasoline: filtered.series[3]
+    });
+  } catch {
+    document.getElementById("oilSummaryError").textContent = "Could not load oil summary.";
+  }
+
   try {
     const items = await fetchTimeline(URLS.hormuzTimeline);
     const target = document.getElementById("timelineScroll");
@@ -876,8 +1065,8 @@ async function initGlobal() {
     const brentFiltered = filterFromThisJanuary(oil.labels, oil.brent);
     const wtiFiltered = filterFromThisJanuary(oil.labels, oil.wti);
 
-    makeLineChart("brentChart", brentFiltered.labels, singleDataset("Brent", brentFiltered.series[0]));
-    makeLineChart("wtiChart", wtiFiltered.labels, singleDataset("WTI", wtiFiltered.series[0]));
+    makeLineChart("brentChart", brentFiltered.labels, singleDataset("Brent", brentFiltered.series[0], COLORS.sand));
+    makeLineChart("wtiChart", wtiFiltered.labels, singleDataset("WTI", wtiFiltered.series[0], COLORS.blueDark));
   } catch {
     document.getElementById("brentError").textContent = "Could not load oil data.";
     document.getElementById("wtiError").textContent = "Could not load oil data.";
@@ -886,7 +1075,7 @@ async function initGlobal() {
   try {
     const gold = await fetchSingleSeries(URLS.gold);
     const filtered = filterFromThisJanuary(gold.labels, gold.values);
-    makeLineChart("goldChart", filtered.labels, singleDataset("Gold", filtered.series[0]));
+    makeLineChart("goldChart", filtered.labels, singleDataset("Gold", filtered.series[0], "#b6862c"));
   } catch {
     document.getElementById("goldError").textContent = "Could not load gold data.";
   }
@@ -894,7 +1083,7 @@ async function initGlobal() {
   try {
     const vix = await fetchSingleSeries(URLS.vix);
     const filtered = filterFromThisJanuary(vix.labels, vix.values);
-    makeLineChart("vixChart", filtered.labels, singleDataset("VIX", filtered.series[0]));
+    makeLineChart("vixChart", filtered.labels, singleDataset("VIX", filtered.series[0], COLORS.rust));
   } catch {
     document.getElementById("vixError").textContent = "Could not load VIX data.";
   }
@@ -904,15 +1093,15 @@ async function initLaos() {
   try {
     const fx = await fetchSingleSeries(URLS.laosFx);
     const filtered = filterFromThisJanuary(fx.labels, fx.values);
-    makeLineChart("fxChart", filtered.labels, singleDataset("KIP / USD", filtered.series[0]));
+    makeLineChart("fxChart", filtered.labels, singleDataset("KIP / USD", filtered.series[0], COLORS.blueDark));
   } catch {
     document.getElementById("fxError").textContent = "Could not load exchange rate data.";
   }
 
   try {
     const reserves = await fetchSingleSeries(URLS.reserves);
-    const filtered = filterFromThisJanuary(reserves.labels, reserves.values);
-    makeLineChart("reservesChart", filtered.labels, singleDataset("Foreign reserves", filtered.series[0]));
+    const filtered = keepLastN(reserves.labels, reserves.values);
+    makeLineChart("reservesChart", filtered.labels, singleDataset("Foreign reserves", filtered.series[0], COLORS.sand));
   } catch {
     document.getElementById("reservesError").textContent = "Could not load reserves data.";
   }
@@ -920,43 +1109,77 @@ async function initLaos() {
   try {
     const fuel = await fetchFuel(URLS.fuel);
     const filtered = filterFromThisJanuary(fuel.labels, fuel.diesel, fuel.gasoline);
-    makeLineChart(
-      "fuelChart",
-      filtered.labels,
-      multiDataset([
-        { label: "Diesel", data: filtered.series[0] },
-        { label: "Gasoline", data: filtered.series[1] }
-      ])
-    );
+    makeGroupedBarChart("fuelChart", filtered.labels, filtered.series[0], filtered.series[1], "Diesel", "Gasoline");
   } catch {
     document.getElementById("fuelError").textContent = "Could not load fuel data.";
   }
 
   try {
-    const cpi = await fetchInflation(URLS.inflation);
-    const filtered = filterFromThisJanuary(
-      cpi.labels,
-      cpi.headline,
-      cpi.core,
-      cpi.nonCore,
-      cpi.rawFood,
-      cpi.fuel
+    const infl = await fetchInflationWide(URLS.inflation);
+
+    const mainFiltered = keepLastN(
+      infl.labels,
+      infl.headline,
+      infl.core,
+      infl.nonCore,
+      infl.rawFood,
+      infl.fuel
     );
 
     makeLineChart(
       "cpiChart",
-      filtered.labels,
+      mainFiltered.labels,
       multiDataset([
-        { label: "Headline inflation", data: filtered.series[0] },
-        { label: "Core inflation", data: filtered.series[1] },
-        { label: "Non-core inflation", data: filtered.series[2] },
-        { label: "Raw food inflation", data: filtered.series[3] },
-        { label: "Fuel inflation", data: filtered.series[4] }
+        { label: "Headline inflation", data: mainFiltered.series[0], color: COLORS.blueDark },
+        { label: "Core inflation", data: mainFiltered.series[1], color: COLORS.blue },
+        { label: "Non-core inflation", data: mainFiltered.series[2], color: COLORS.sand },
+        { label: "Raw food inflation", data: mainFiltered.series[3], color: "#7f9b6a" },
+        { label: "Fuel inflation", data: mainFiltered.series[4], color: COLORS.rust }
+      ]),
+      8
+    );
+
+    const goodsFiltered = keepLastN(
+      infl.labels,
+      infl.domesticGoods,
+      infl.importedGoods
+    );
+
+    makeLineChart(
+      "goodsInflationChart",
+      goodsFiltered.labels,
+      multiDataset([
+        { label: "Domestic goods inflation", data: goodsFiltered.series[0], color: COLORS.blueDark },
+        { label: "Imported goods inflation", data: goodsFiltered.series[1], color: COLORS.sand }
       ]),
       8
     );
   } catch {
     document.getElementById("cpiError").textContent = "Could not load inflation data.";
+    document.getElementById("goodsInflationError").textContent = "Could not load goods inflation data.";
+  }
+
+  try {
+    const items = await fetchTimeline(URLS.laosTimeline);
+    const target = document.getElementById("laosTimelineScroll");
+
+    if (!items.length) {
+      target.innerHTML = "No Laos timeline data found.";
+      return;
+    }
+
+    target.innerHTML = items
+      .slice()
+      .reverse()
+      .map(item => `
+        <div class="timeline-row">
+          <div class="timeline-date">${item.date || ""}</div>
+          <div class="timeline-text">${item.event || ""}</div>
+        </div>
+      `)
+      .join("");
+  } catch {
+    document.getElementById("laosTimelineError").textContent = "Could not load Laos timeline.";
   }
 }
 
