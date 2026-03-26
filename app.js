@@ -619,28 +619,16 @@ async function fetchHormuzOil(url) {
 
   return { labels, brent, wti, ttf, usGasoline };
 }
-
 async function fetchTextBlock(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
 
   const text = await res.text();
-
   const rows = text.trim().split("\n");
 
   if (rows.length < 2) return "";
 
-  return rows[1].replace(/"/g, "").trim();
-}
-
-  const headers = rows[0].map(h => (h || "").replace(/"/g, "").toLowerCase().trim());
-  const textIdx = headers.findIndex(h => h === "text" || h.includes("text") || h.includes("paragraph"));
-
-  if (textIdx >= 0 && rows[1][textIdx]) {
-    return (rows[1][textIdx] || "").replace(/"/g, "").trim();
-  }
-
-  return (rows[1][0] || "").replace(/"/g, "").trim();
+  return rows.slice(1).join("\n").replace(/"/g, "").trim();
 }
 
 async function fetchTimeline(url) {
