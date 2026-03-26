@@ -271,13 +271,13 @@ function render() {
           A compact dashboard for monitoring global oil disruption signals, Laos transmission channels,
           and crisis developments over time.
         </div>
-        <div class="meta">Live data from your Google Sheets. Hormuz disruption content attributed below.</div>
+        <div class="meta">Last update: 26 March, 2026.</div>
       </section>
 
       <section class="overall-grid">
         <div class="card">
-          <h3>Overall</h3>
-          <p class="sub">Free text from Google Sheet</p>
+          <h3>Overview</h3>
+          <p class="sub">Impact and key transmission channels</p>
           <div id="overallText" class="free-text">Loading...</div>
           <div id="overallTextError" class="error"></div>
         </div>
@@ -320,7 +320,7 @@ function render() {
       </section>
 
       <div class="footer-note">
-        Hormuz disruption and oil-market content should be attributed to HormuzTracker. Laos macro series are drawn from your linked Google Sheets tabs.
+        Hormuztracker.com. Laos macro indicators are drawn from national sources.
       </div>
     </div>
   `;
@@ -624,8 +624,14 @@ async function fetchTextBlock(url) {
   const res = await fetch(url);
   if (!res.ok) throw new Error("Fetch failed");
 
-  const rows = parseCSV(await res.text());
+  const text = await res.text();
+
+  const rows = text.trim().split("\n");
+
   if (rows.length < 2) return "";
+
+  return rows[1].replace(/"/g, "").trim();
+}
 
   const headers = rows[0].map(h => (h || "").replace(/"/g, "").toLowerCase().trim());
   const textIdx = headers.findIndex(h => h === "text" || h.includes("text") || h.includes("paragraph"));
